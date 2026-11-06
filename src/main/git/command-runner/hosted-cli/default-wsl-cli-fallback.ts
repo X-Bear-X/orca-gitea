@@ -16,7 +16,7 @@ import {
  * than "not installed"; inside a user act for that distro it may still start it.
  */
 export async function resolveDefaultWslCliFallback(
-  command: 'gh' | 'glab',
+  command: 'gh' | 'glab' | 'tea' | 'gt',
   args: string[]
 ): Promise<ResolvedCommand | null> {
   const resolved = resolveDefaultWslCli(command, args)

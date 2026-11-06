@@ -77,7 +77,8 @@ export function useChecksDetailTimer({
         current.activeGitLabReview?.state ?? current.pr?.state,
         current.activeGitLabReview?.status ?? current.pr?.checksStatus,
         current.pollIntervalRef.current,
-        cadence
+        cadence,
+        current.activeGitLabReview?.provider
       )
     }
     // Under a stretched or stopped cadence the window coming back still reads checks older than

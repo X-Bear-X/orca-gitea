@@ -76,7 +76,7 @@ export function defaultWslCliDistro(): string | null {
 }
 
 export function resolveDefaultWslCli(
-  command: 'gh' | 'glab',
+  command: 'gh' | 'glab' | 'tea' | 'gt',
   args: string[]
 ): ResolvedCommand | null {
   const distro = defaultWslCliDistro()

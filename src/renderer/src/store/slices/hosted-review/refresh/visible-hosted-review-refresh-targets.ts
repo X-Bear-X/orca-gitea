@@ -181,7 +181,9 @@ export function getVisibleHostedReviewRefreshTargets(
       state: review?.state,
       checksStatus: usePR ? prEntry.data?.checksStatus : hostedEntry?.data?.status,
       hasReview: review ? true : fetchedAt !== null ? false : null,
-      selected
+      selected,
+      provider: usePR ? ('github' as const) : hostedEntry?.data?.provider,
+      unchangedReads: usePR ? undefined : hostedEntry?.unchangedReads
     }
     const target: VisibleHostedReviewRefreshTarget = {
       key,

@@ -140,7 +140,9 @@ function referenceRefreshTargets(
         state: review?.state,
         checksStatus: review?.status,
         hasReview: review ? true : null,
-        selected
+        selected,
+        provider: review?.provider,
+        unchangedReads: entry?.unchangedReads
       }
       targets.set(key, {
         key,

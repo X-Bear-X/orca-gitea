@@ -30,6 +30,7 @@ import {
 } from '../../../shared/execution-host/execution-host'
 import { getStoredRepoExecutionHostId } from '../../workspaces/execution-host/repo-execution-host'
 import { guardWslUncPathAccess } from '../../wsl/filesystem/wsl-unc-access-gate'
+import { registerGiteaHandlers } from './gitea'
 
 function assertRegisteredRepo(repoPath: string, store: Store, repoId?: string): Repo {
   if (repoId) {
@@ -114,6 +115,7 @@ function normalizeRemoteHostedReviewPath(remotePath: string): string {
 }
 
 export function registerHostedReviewHandlers(store: Store, stats: StatsCollector): void {
+  registerGiteaHandlers(store)
   ipcMain.handle('hostedReview:forBranch', async (_event, args: HostedReviewForBranchArgs) => {
     const repo = assertRegisteredRepoForBranch(args, store)
     const localGitOptions = {

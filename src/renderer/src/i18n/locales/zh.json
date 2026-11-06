@@ -11459,7 +11459,13 @@
                   "statusConnected": "已连接",
                   "statusUnavailable": "不可用",
                   "statusNotInstalled": "未安装",
-                  "statusNotAuthenticated": "未通过身份验证"
+                  "statusNotAuthenticated": "未通过身份验证",
+                  "giteaViaPrefix": "通过",
+                  "giteaUnavailable": "当前运行环境暂不支持查看 Gitea CLI 状态。",
+                  "giteaInstallHint": "安装 Gitea CLI（gt）以启用 pull request、Actions 任务和评论。",
+                  "giteaInstall": "安装 Gitea CLI",
+                  "giteaLoginHint": "Gitea CLI 已安装，但还没有登录你的服务器。请在终端中运行此命令：",
+                  "giteaLoginCommand": "gt auth login --host <gitea-url>"
                 }
               }
             }

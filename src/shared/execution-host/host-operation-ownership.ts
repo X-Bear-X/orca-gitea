@@ -31,6 +31,7 @@ export const HOST_OPERATION_OWNERSHIP = {
   files: 'host',
   folderWorkspace: 'host',
   git: 'host',
+  gitea: 'credential',
   github: 'credential',
   gitlab: 'credential',
   host: 'host',

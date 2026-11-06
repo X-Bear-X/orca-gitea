@@ -1,6 +1,9 @@
 import type { PRCheckDetail } from './check-types'
 import type { CheckStatus } from '../pull-requests/pull-request-types'
-import type { HostedReviewState } from '../../source-control/hosted-review/hosted-review-contracts'
+import type {
+  HostedReviewProvider,
+  HostedReviewState
+} from '../../source-control/hosted-review/hosted-review-contracts'
 import {
   getPRAutoRefreshCadence,
   reviewRefreshIntervalMs,
@@ -80,7 +83,8 @@ export class ChecksDetailPollingPolicy {
     state: HostedReviewState | undefined,
     aggregateStatus: CheckStatus | undefined,
     backoffMs: number,
-    cadence: PRAutoRefreshCadence = getPRAutoRefreshCadence()
+    cadence: PRAutoRefreshCadence = getPRAutoRefreshCadence(),
+    provider?: HostedReviewProvider | null
   ): number | null {
     if (this.failed) {
       return scaleReviewRefreshInterval(
@@ -94,7 +98,8 @@ export class ChecksDetailPollingPolicy {
         state,
         checksStatus: status,
         hasReview: true,
-        selected: true
+        selected: true,
+        provider
       },
       cadence
     )

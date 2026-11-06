@@ -31,6 +31,7 @@ import { ghApi } from './api/github/gh-bridge'
 import { hostedReviewApi } from './api/hosted-review/hosted-review-bridge'
 import { glApi } from './api/gitlab/gitlab'
 import { bitbucketApi } from './api/hosted-review/bitbucket-bridge'
+import { giteaApi } from './api/gitea/gitea-bridge'
 import { linearApi } from './api/work-items/linear-bridge'
 import { jiraApi } from './api/work-items/jira-bridge'
 import { starNagApi } from './api/onboarding/star-nag-bridge'
@@ -136,6 +137,7 @@ const api = {
   hostedReview: hostedReviewApi,
   gl: glApi,
   bitbucket: bitbucketApi,
+  gitea: giteaApi,
   linear: linearApi,
   jira: jiraApi,
   starNag: starNagApi,

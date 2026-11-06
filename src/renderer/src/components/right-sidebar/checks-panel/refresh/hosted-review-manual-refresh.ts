@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/index'
 import { latestLookupGeneration } from '@/store/lookup-generation-sequence'
 import { refreshHostedReviewCard } from '@/store/slices/hosted-review-card-refresh'
 import type { ChecksPanelManualRefreshInput } from './manual-refresh-dependencies'
+import { hostedDetailsReviewOr } from '../gitea-review-client'
 
 /** Reviews and links name the provider first; an unlinked branch falls back to the remote's provider, not GitHub. */
 export function checksPanelManualRefreshProvider(
@@ -104,11 +105,10 @@ export async function refreshChecksPanelHostedReview(
   if (!isCurrentRequest()) {
     return 'superseded'
   }
-  if (provider !== 'gitlab') {
+  if (provider !== 'gitlab' && provider !== 'gitea') {
     return 'review'
   }
-  const refreshedGitLabReview =
-    refreshedReview?.provider === 'gitlab' ? refreshedReview : activeGitLabReview
+  const refreshedGitLabReview = hostedDetailsReviewOr(refreshedReview, activeGitLabReview)
   if (refreshedGitLabReview) {
     await fetchGitLabDetails({
       mrNumberOverride: refreshedGitLabReview.number,

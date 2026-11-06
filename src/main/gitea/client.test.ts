@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { cancelTrackingResponse } from '../lib/unread-response-body.test-fixtures'
 
-const { gitExecFileAsyncMock } = vi.hoisted(() => ({
-  gitExecFileAsyncMock: vi.fn()
+const { gitExecFileAsyncMock, giteaCliExecFileAsyncMock } = vi.hoisted(() => ({
+  gitExecFileAsyncMock: vi.fn(),
+  giteaCliExecFileAsyncMock: vi.fn()
+}))
+
+vi.mock('../git/command-runner/gitea-cli-exec-file', () => ({
+  giteaCliExecFileAsync: giteaCliExecFileAsyncMock
 }))
 
 vi.mock('../git/command-runner/git-exec-file', async (importOriginal) => ({
@@ -17,6 +22,7 @@ import {
   normalizeGiteaApiBaseUrl
 } from './client'
 import { _resetGiteaRepoRefCache } from './repository-ref'
+import { _resetGiteaCliStateCache } from './cli-logins'
 import {
   _getGiteaPullRequestScanCacheSize,
   _resetGiteaPullRequestScanCache,
@@ -65,6 +71,11 @@ describe('Gitea client', () => {
       stderr: ''
     })
     _resetGiteaRepoRefCache()
+    _resetGiteaCliStateCache()
+    giteaCliExecFileAsyncMock.mockReset()
+    giteaCliExecFileAsyncMock.mockImplementation(async (command: string) => {
+      throw Object.assign(new Error(`spawn ${command} ENOENT`), { code: 'ENOENT' })
+    })
     _resetGiteaPullRequestScanCache()
     __resetRepoDefaultBranchCacheForTests()
     vi.unstubAllGlobals()
@@ -317,6 +328,8 @@ describe('Gitea client', () => {
       await getGiteaPullRequestForBranch('/repo', 'feature/gitea')
       expect(_getGiteaPullRequestScanCacheSize()).toBe(1)
       await vi.advanceTimersByTimeAsync(30_001)
+      expect(_getGiteaPullRequestScanCacheSize()).toBe(1)
+      await vi.advanceTimersByTimeAsync(30_000)
       expect(_getGiteaPullRequestScanCacheSize()).toBe(0)
       await getGiteaPullRequestForBranch('/repo', 'feature/gitea')
       expect(listCalls).toBe(2)
@@ -410,7 +423,65 @@ describe('Gitea client', () => {
       authenticated: true,
       account: null,
       baseUrl: null,
-      tokenConfigured: true
+      tokenConfigured: true,
+      cliInstalled: false,
+      cliAuthenticated: false,
+      cli: null
+    })
+  })
+
+  it('reports gt logins as connected, like glab auth status', async () => {
+    delete process.env.ORCA_GITEA_TOKEN
+    giteaCliExecFileAsyncMock.mockImplementation(async (command: string, args: string[]) => {
+      if (command === 'tea') {
+        throw Object.assign(new Error('spawn tea ENOENT'), { code: 'ENOENT' })
+      }
+      return args[0] === '--version'
+        ? { stdout: 'gt version 1.1.0\nhttps://gitea.com/gitea/cli', stderr: '' }
+        : {
+            stdout: JSON.stringify([
+              {
+                host: 'https://git.example.com',
+                user: 'ana',
+                credential_available: true,
+                error: ''
+              }
+            ]),
+            stderr: ''
+          }
+    })
+
+    await expect(getGiteaAuthStatus()).resolves.toEqual({
+      configured: true,
+      authenticated: true,
+      account: 'ana@git.example.com',
+      baseUrl: 'https://git.example.com',
+      tokenConfigured: false,
+      cliInstalled: true,
+      cliAuthenticated: true,
+      cli: 'gt'
+    })
+    expect(giteaCliExecFileAsyncMock).toHaveBeenCalledWith('gt', ['auth', 'status', '--json'], {
+      timeout: 10_000
+    })
+  })
+
+  it('reports an installed gt without a login as not authenticated', async () => {
+    delete process.env.ORCA_GITEA_TOKEN
+    giteaCliExecFileAsyncMock.mockImplementation(async (command: string, args: string[]) => {
+      if (command === 'tea') {
+        throw Object.assign(new Error('spawn tea ENOENT'), { code: 'ENOENT' })
+      }
+      return args[0] === '--version'
+        ? { stdout: 'gt version 1.1.0 gitea', stderr: '' }
+        : { stdout: '[]', stderr: '' }
+    })
+
+    await expect(getGiteaAuthStatus()).resolves.toMatchObject({
+      authenticated: false,
+      cliInstalled: true,
+      cliAuthenticated: false,
+      cli: 'gt'
     })
   })
 
@@ -426,7 +497,10 @@ describe('Gitea client', () => {
       authenticated: true,
       account: 'gitea-user',
       baseUrl: 'https://git.example.com/api/v1',
-      tokenConfigured: true
+      tokenConfigured: true,
+      cliInstalled: false,
+      cliAuthenticated: false,
+      cli: null
     })
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe('https://git.example.com/api/v1/user')
   })

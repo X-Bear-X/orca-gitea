@@ -20,6 +20,8 @@ type HostedReviewCommandName =
   | 'getHostedReviewCreationEligibility'
   | 'createHostedReview'
   | 'createStackedHostedReview'
+  | 'getGiteaPullRequestDetails'
+  | 'getGiteaJobLog'
 type GitHubRepositoryQueryCommandName =
   | 'listRepoWorkItems'
   | 'listRepoIssues'
@@ -155,6 +157,8 @@ export function installRuntimeRepositoryCommandSurface(
     getHostedReviewCreationEligibility: reviews.getHostedReviewCreationEligibility.bind(reviews),
     createHostedReview: reviews.createHostedReview.bind(reviews),
     createStackedHostedReview: reviews.createStackedHostedReview.bind(reviews),
+    getGiteaPullRequestDetails: reviews.getGiteaPullRequestDetails.bind(reviews),
+    getGiteaJobLog: reviews.getGiteaJobLog.bind(reviews),
     listRepoWorkItems: queries.listRepoWorkItems.bind(queries),
     listRepoIssues: queries.listRepoIssues.bind(queries),
     getRepoWorkItem: queries.getRepoWorkItem.bind(queries),

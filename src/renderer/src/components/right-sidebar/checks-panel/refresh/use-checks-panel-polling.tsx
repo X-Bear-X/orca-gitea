@@ -21,6 +21,12 @@ import {
   gitLabMRCommentsToPRComments
 } from '../gitlab-review-client'
 import { checksPanelLoadErrorMessage } from '../checks-panel-forge-owner'
+import { fetchGiteaPRDetailsForChecks } from '../gitea-review-client'
+import {
+  giteaCommentsSignature,
+  giteaJobsToPRChecks
+} from '../../../../../../shared/gitea-review-details'
+import { nextGiteaRefreshIntervalMs } from '../../../../../../shared/review-refresh-policy'
 import { forgeOwnerHostIdForWorkspace } from '@/runtime/forge-credential-target'
 import { isWslDistroNotRunningRefusal } from '../../../../../../shared/wsl-distro-not-running-refusal'
 import { translate } from '@/i18n/i18n'
@@ -64,7 +70,7 @@ export function useChecksPanelPolling(model: ChecksPanelPollingInput) {
     repo?.connectionId,
     model.activeWorktree?.hostId,
     branch,
-    activeGitLabReview ? 'gitlab' : 'github',
+    activeGitLabReview?.provider ?? 'github',
     activeGitLabReview?.number ?? prNumber,
     activeGitLabReview?.headSha ?? pr?.headSha,
     pr?.prRepo?.owner,
@@ -204,10 +210,11 @@ export function useChecksPanelPolling(model: ChecksPanelPollingInput) {
       if (!repo || !targetMRNumber) {
         return
       }
+      const provider = activeGitLabReview?.provider ?? 'gitlab'
       const requestKey = checksPanelHostedReviewAsyncResultKey(
         hostedReviewCacheKey,
         branch,
-        'gitlab',
+        provider,
         targetMRNumber,
         targetHeadSha
       )
@@ -226,6 +233,27 @@ export function useChecksPanelPolling(model: ChecksPanelPollingInput) {
       setChecksLoading(true)
       setCommentsLoading(true)
       try {
+        if (provider === 'gitea') {
+          const giteaDetails = await fetchGiteaPRDetailsForChecks({
+            repoPath: repo.path,
+            repoId: repo.id,
+            repoOwnerExecutionHostId: forgeOwnerHostIdForWorkspace(repo, activeWorktree),
+            prNumber: targetMRNumber
+          })
+          if (isRequestCurrent?.() === false || !isCurrentAsyncResult(requestKey)) {
+            return
+          }
+          const giteaChecks = giteaJobsToPRChecks(giteaDetails.jobs)
+          setChecks(giteaChecks)
+          setComments(giteaDetails.comments)
+          const giteaSignature = `${policyRef.current.accept(giteaChecks)}|${giteaCommentsSignature(giteaDetails.comments)}`
+          pollIntervalRef.current = nextGiteaRefreshIntervalMs(
+            pollIntervalRef.current,
+            giteaSignature !== prevChecksRef.current
+          )
+          prevChecksRef.current = giteaSignature
+          return
+        }
         const details = await fetchGitLabMRDetailsForChecks({
           repoPath: repo.path,
           repoId: repo.id,

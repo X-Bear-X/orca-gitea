@@ -24,6 +24,10 @@ export type PreflightStatus = {
     account: string | null
     baseUrl: string | null
     tokenConfigured: boolean
+    /** tea CLI presence and logins; absent on payloads predating the tea integration. */
+    cliInstalled?: boolean
+    cliAuthenticated?: boolean
+    cli?: 'gt' | 'tea' | null
   }
 }
 

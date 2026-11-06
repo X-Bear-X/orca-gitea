@@ -260,7 +260,7 @@ export function ChecksPanelActiveContent({
           sourceControlAiActionsVisible ? handleResolveCommentsWithAI : undefined
         }
         onReply={pr ? handleReplyToComment : undefined}
-        onResolve={pr || activeGitLabReview ? handleResolve : undefined}
+        onResolve={pr || activeGitLabReview?.provider === 'gitlab' ? handleResolve : undefined}
         onEditComment={pr ? handleEditComment : undefined}
         onDeleteComment={pr ? handleDeleteComment : undefined}
         onSetReaction={canTargetPRComments ? handleSetReaction : undefined}

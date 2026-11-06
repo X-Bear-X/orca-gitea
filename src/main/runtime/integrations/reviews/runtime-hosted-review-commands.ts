@@ -29,6 +29,11 @@ import {
 import type { HostedReviewExecutionOptions } from '../../../source-control/hosted-review-git-options'
 import { createStackedHostedReview } from '../../../source-control/stacked-hosted-review-creation'
 import { guardWslUncPathAccess } from '../../../wsl/filesystem/wsl-unc-access-gate'
+import { getGiteaJobLog, getGiteaPullRequestDetails } from '../../../gitea/pull-request-details'
+import type {
+  GiteaJobLogResult,
+  GiteaPullRequestDetails
+} from '../../../../shared/gitea-review-details'
 
 type HostedReviewTargetArgs = { repoSelector: string; worktreeSelector?: string }
 
@@ -52,6 +57,27 @@ export class RuntimeHostedReviewCommands {
     return options
       ? getRepoSlug(repo.path, connectionId, options)
       : getRepoSlug(repo.path, connectionId)
+  }
+
+  /** Gitea checks-panel reads run on the repo's owner host, so remote-runtime workspaces see them too. */
+  async getGiteaPullRequestDetails(
+    repoSelector: string,
+    prNumber: number
+  ): Promise<GiteaPullRequestDetails> {
+    const repo = await this.deps.resolveRepo(repoSelector)
+    const connectionId = hostedReviewSshConnectionId(getStoredRepoExecutionHostId(repo))
+    return getGiteaPullRequestDetails(
+      repo.path,
+      prNumber,
+      connectionId,
+      this.deps.getExecutionOptions(repo) ?? {}
+    )
+  }
+
+  async getGiteaJobLog(repoSelector: string, jobId: number): Promise<GiteaJobLogResult> {
+    const repo = await this.deps.resolveRepo(repoSelector)
+    const connectionId = hostedReviewSshConnectionId(getStoredRepoExecutionHostId(repo))
+    return getGiteaJobLog(repo.path, jobId, connectionId, this.deps.getExecutionOptions(repo) ?? {})
   }
 
   async getRepoUpstream(repoSelector: string): Promise<GitHubOwnerRepo | null> {

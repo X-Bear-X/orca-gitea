@@ -60,7 +60,8 @@ export function useChecksDetailTimer({
       return policyRef.current.delayMs(
         current.activeGitLabReview?.state ?? current.pr?.state,
         current.activeGitLabReview?.status ?? current.pr?.checksStatus,
-        current.pollIntervalRef.current
+        current.pollIntervalRef.current,
+        current.activeGitLabReview?.provider
       )
     }
     const cleanup = installWindowVisibilityTimeoutPoller({

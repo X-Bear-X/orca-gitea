@@ -29,6 +29,7 @@ import {
   shouldRefetchGitHubScopedResultForNoHint,
   withCreationEligibilityTimeout,
   withHostedReviewCacheEntry,
+  nextHostedReviewUnchangedReads,
   type CreateHostedReviewStoreInput,
   type CreateStackedHostedReviewStoreInput,
   type HostedReviewCacheEntry,
@@ -242,6 +243,15 @@ export const createHostedReviewSlice: StateCreator<AppState, [], [], HostedRevie
                     readOutcome === 'provider'
                       ? generation
                       : state.hostedReviewCache[cacheKey]?.providerReadGeneration,
+                  ...(review?.provider === 'gitea'
+                    ? {
+                        unchangedReads: nextHostedReviewUnchangedReads(
+                          state.hostedReviewCache[cacheKey],
+                          review,
+                          readOutcome === 'provider'
+                        )
+                      }
+                    : {}),
                   // Why: fallback PR hints come from this branch's PR cache; preserve that provenance separately from request identity.
                   ...(review?.provider === 'github' &&
                   options?.linkedGitHubPR == null &&

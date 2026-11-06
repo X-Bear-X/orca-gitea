@@ -26,9 +26,8 @@ export function selectChecksPanelReview({
   linkedAzureDevOpsPR,
   linkedGiteaPR
 }: ChecksPanelReviewSelectionInput): ChecksPanelReview | null {
-  const gitLabHostedReview = hostedReview?.provider === 'gitlab' ? hostedReview : null
-  if (gitLabHostedReview) {
-    return gitLabHostedReview
+  if (hostedReview?.provider === 'gitlab' || hostedReview?.provider === 'gitea') {
+    return hostedReview
   }
   const hasNonGitHubLinkedReview =
     linkedGitLabMR !== null ||
@@ -45,4 +44,22 @@ export function selectChecksPanelReview({
     return null
   }
   return pr ? gitHubPRToChecksPanelReview(pr) : null
+}
+
+/** Refresh through the hosted-review card + details path for GitLab and Gitea, never the GitHub PR cache. */
+export function isHostedDetailsRefreshContext({
+  activeReview,
+  linkedGitLabMR,
+  linkedGiteaPR
+}: {
+  activeReview: ChecksPanelReview | null
+  linkedGitLabMR: number | null
+  linkedGiteaPR: number | null
+}): boolean {
+  return (
+    activeReview?.provider === 'gitlab' ||
+    activeReview?.provider === 'gitea' ||
+    linkedGitLabMR !== null ||
+    linkedGiteaPR !== null
+  )
 }

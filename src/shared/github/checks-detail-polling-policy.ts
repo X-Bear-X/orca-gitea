@@ -1,6 +1,9 @@
 import type { PRCheckDetail } from './check-types'
 import type { CheckStatus } from './pull-request-types'
-import type { HostedReviewState } from '../source-control/hosted-review/hosted-review-contracts'
+import type {
+  HostedReviewProvider,
+  HostedReviewState
+} from '../source-control/hosted-review/hosted-review-contracts'
 import { reviewRefreshIntervalMs } from '../review-refresh-policy'
 
 export function detailedChecksStatus(checks: readonly PRCheckDetail[]): CheckStatus | undefined {
@@ -67,7 +70,8 @@ export class ChecksDetailPollingPolicy {
   delayMs(
     state: HostedReviewState | undefined,
     aggregateStatus: CheckStatus | undefined,
-    backoffMs: number
+    backoffMs: number,
+    provider?: HostedReviewProvider | null
   ): number | null {
     if (this.failed) {
       return Math.max(state === 'closed' ? 900_000 : 60_000, backoffMs)
@@ -77,7 +81,8 @@ export class ChecksDetailPollingPolicy {
       state,
       checksStatus: status,
       hasReview: true,
-      selected: true
+      selected: true,
+      provider
     })
     if (interval === null) {
       return null

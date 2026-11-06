@@ -173,6 +173,10 @@ export default function HostedReviewActions({
     runWorktreeDelete(worktree.id, worktree.hostId ? { expectedHostId: worktree.hostId } : {})
   }, [worktree.hostId, worktree.id])
 
+  if (review.provider === 'gitea') {
+    return null
+  }
+
   if (review.state === 'draft' && (review.provider === 'github' || review.provider === 'gitlab')) {
     return (
       <DraftReviewActions

@@ -9,8 +9,8 @@ type GiteaPullRequestScanEntry = {
   pullRequests: RawGiteaPullRequest[]
 }
 
-// Absorb card-refresh bursts while promptly discovering externally created PRs.
-const SCAN_TTL_MS = 30_000
+// Branch lookups list every PR page; reuse a listing for a minute, the fastest Gitea review cadence.
+const SCAN_TTL_MS = 60_000
 // Retry failures sooner than successful listings so outages do not look like durable misses.
 const FAILED_SCAN_RETRY_MS = 3_000
 // Each payload can retain hundreds of PRs; TTL alone does not bound session memory.

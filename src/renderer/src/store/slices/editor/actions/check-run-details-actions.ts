@@ -10,7 +10,7 @@ import {
   type CheckRunDetailsTabPatch
 } from '@/components/editor/check-details/actions/check-run-details-tab'
 import type { OpenCheckRunDetailsState } from '../../../../../../shared/editor-tab-view-types'
-import { loadGitLabJobLogDetails } from '@/runtime/gitlab-job-trace-client'
+import { loadForgeJobLogDetails } from '@/runtime/forge-job-log-details'
 import { forgeOwnerHostIdForWorkspace } from '@/runtime/forge-credential-target'
 import type { OpenFile } from '../types/open-file'
 import { openWorkspaceEditorItem } from '../tabs/workspace-editor-item'
@@ -266,27 +266,26 @@ export function createCheckRunDetailsActions(
       patch({ details: checkRunDetails.details, loading: true, error: null })
       try {
         const repoOwnerExecutionHostId = forgeOwnerHostIdForWorkspace(repo, worktree)
-        // GitLab jobs require GitLab trace; GitHub check-runs returns null and blanks the refreshed tab.
-        const details = check.gitlabJobId
-          ? await loadGitLabJobLogDetails({
-              repoPath: repo.path,
-              repoId: repo.id,
-              repoOwnerExecutionHostId,
-              check,
-              // Why: a fork MR's job lives in the source project, not the repo's own.
-              projectRef: checkRunDetails.gitlabProjectRef ?? null
-            })
-          : await get().fetchPRCheckDetails(
-              repo.path,
-              {
-                checkRunId: check.checkRunId,
-                workflowRunId: check.workflowRunId,
-                checkName: check.name,
-                url: check.url,
-                prRepo: checkRunDetails.githubRepository ?? null
-              },
-              { repoId: repo.id, repoOwnerExecutionHostId }
-            )
+        // Forge jobs need their own log reads; GitHub check-runs returns null and blanks the refreshed tab.
+        const details =
+          (await loadForgeJobLogDetails({
+            repoPath: repo.path,
+            repoId: repo.id,
+            repoOwnerExecutionHostId,
+            check,
+            gitlabProjectRef: checkRunDetails.gitlabProjectRef
+          })) ??
+          (await get().fetchPRCheckDetails(
+            repo.path,
+            {
+              checkRunId: check.checkRunId,
+              workflowRunId: check.workflowRunId,
+              checkName: check.name,
+              url: check.url,
+              prRepo: checkRunDetails.githubRepository ?? null
+            },
+            { repoId: repo.id, repoOwnerExecutionHostId }
+          ))
         patch({
           details,
           loading: false,

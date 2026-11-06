@@ -11170,7 +11170,13 @@
                   "statusConnected": "已連線",
                   "statusUnavailable": "無法使用",
                   "statusNotInstalled": "未安裝",
-                  "statusNotAuthenticated": "未經過驗證"
+                  "statusNotAuthenticated": "未經過驗證",
+                  "giteaViaPrefix": "透過",
+                  "giteaUnavailable": "目前的執行環境暫不支援查看 Gitea CLI 狀態。",
+                  "giteaInstallHint": "安裝 Gitea CLI（gt）以啟用 pull request、Actions 工作與留言。",
+                  "giteaInstall": "安裝 Gitea CLI",
+                  "giteaLoginHint": "Gitea CLI 已安裝，但尚未登入你的伺服器。請在終端機中執行此指令：",
+                  "giteaLoginCommand": "gt auth login --host <gitea-url>"
                 }
               }
             }
@@ -11219,16 +11225,6 @@
                 "cards": {
                   "793a06e899": "重新檢查",
                   "1a9475dace": "瞭解更多",
-                  "19fb419c12": "Gitea 憑證已設定但無法通過身分驗證。請檢查權杖、API 基礎 URL 和存放庫權限；如果環境變數已變更，請重新啟動 Orca。",
-                  "60708f23da": "僅當 Orca 無法從遠端推導出 API URL 時。",
-                  "709057ad91": "ORCA_GITEA_API_BASE_URL",
-                  "6da9dfa5de": "用於私有存放庫，並設定",
-                  "6d5c2a3005": "ORCA_GITEA_TOKEN",
-                  "fcbe0469fd": "公開存放庫會從其 git remote 偵測。設定",
-                  "0613928cb3": "此執行環境尚無法提供 Gitea 狀態。",
-                  "05863d2599": "透過 Gitea REST API 取得 PR 和提交狀態。",
-                  "52f75876be": "已偵測存放庫的 PR 和提交狀態",
-                  "0b5242f8a2": "{{value0}} · PR 和提交狀態",
                   "40f678df73": "Azure DevOps 憑證已設定但無法通過身分驗證。請檢查權杖、API 基礎 URL 和存放庫權限；如果環境變數已變更，請重新啟動 Orca。",
                   "7bd345e3f6": "僅當 Orca 無法從 git remote 推導出 API 基礎 URL 時。",
                   "186a6689df": "ORCA_AZURE_DEVOPS_API_BASE_URL",

@@ -81,7 +81,7 @@ export function useChecksPanelCommentResolution(model: ChecksPanelCommentResolut
       const rollbackThread = (previousThreadComments: PRComment[]): void => {
         setComments((prev) => restorePRCommentThreadSnapshot(prev, previousThreadComments))
       }
-      if (repo && activeGitLabReview) {
+      if (repo && activeGitLabReview?.provider === 'gitlab') {
         let previousThreadComments: PRComment[] = []
         let result: GitLabDiscussionResolveResult
         try {

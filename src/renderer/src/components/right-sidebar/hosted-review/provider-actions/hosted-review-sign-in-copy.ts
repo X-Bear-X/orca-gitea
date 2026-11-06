@@ -7,11 +7,12 @@ import {
 } from '@/i18n/hosted-review-localized-copy'
 
 // Commands and variable names stay untranslated.
-const SIGN_IN_COMMANDS = { github: 'gh auth login', gitlab: 'glab auth login' } as const
-const SIGN_IN_VARIABLES = {
-  'azure-devops': 'ORCA_AZURE_DEVOPS_TOKEN',
-  gitea: 'ORCA_GITEA_TOKEN'
+const SIGN_IN_COMMANDS = {
+  github: 'gh auth login',
+  gitlab: 'glab auth login',
+  gitea: 'gt auth login'
 } as const
+const SIGN_IN_VARIABLES = { 'azure-devops': 'ORCA_AZURE_DEVOPS_TOKEN' } as const
 
 export function authRequiredDetail(
   provider: SupportedHostedReviewCopyProvider,
@@ -23,7 +24,7 @@ export function authRequiredDetail(
       'Bitbucket is not authenticated. Next step: connect Bitbucket in Settings > Integrations, or set ORCA_BITBUCKET_* in this environment.'
     )
   }
-  if (provider === 'github' || provider === 'gitlab') {
+  if (provider === 'github' || provider === 'gitlab' || provider === 'gitea') {
     return translate(
       'sourceControl.createReviewFailure.authRequiredCommand',
       '{{providerName}} is not authenticated. Next step: run {{command}} in this environment.',
@@ -46,7 +47,7 @@ export function hostedReviewSignInHint(provider: HostedReviewProvider | undefine
       'Connect Bitbucket in Settings > Integrations'
     )
   }
-  if (supported === 'github' || supported === 'gitlab') {
+  if (supported === 'github' || supported === 'gitlab' || supported === 'gitea') {
     return translate(
       'sourceControl.createReviewFailure.signInHintCommand',
       'Run {{command}} in this environment',

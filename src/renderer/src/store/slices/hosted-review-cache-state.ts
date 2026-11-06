@@ -24,6 +24,38 @@ export type HostedReviewCacheEntry<T> = {
   branchLookupGitHubPRNumber?: number
   /** Lookup generation of the newest request the host answered from a provider read it stored as current. */
   providerReadGeneration?: number
+  /** Consecutive provider reads that returned the same review; Gitea polling slows down on it. */
+  unchangedReads?: number
+}
+
+function hostedReviewChangeSignature(review: HostedReviewInfo | null | undefined): string {
+  return review
+    ? JSON.stringify([
+        review.provider,
+        review.number,
+        review.state,
+        review.title,
+        review.status,
+        review.updatedAt,
+        review.headSha ?? null
+      ])
+    : ''
+}
+
+/** Only provider reads advance the count; cache hits and fallbacks did not look at the forge again. */
+export function nextHostedReviewUnchangedReads(
+  previous: HostedReviewCacheEntry<HostedReviewInfo> | undefined,
+  review: HostedReviewInfo | null,
+  providerRead: boolean
+): number {
+  if (!previous) {
+    return 0
+  }
+  if (hostedReviewChangeSignature(previous.data) !== hostedReviewChangeSignature(review)) {
+    return 0
+  }
+  const unchangedReads = previous.unchangedReads ?? 0
+  return providerRead ? unchangedReads + 1 : unchangedReads
 }
 export type HostedReviewCache = Record<string, HostedReviewCacheEntry<HostedReviewInfo>>
 

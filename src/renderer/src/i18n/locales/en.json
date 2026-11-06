@@ -11654,7 +11654,13 @@
                   "statusConnected": "Connected",
                   "statusUnavailable": "Unavailable",
                   "statusNotInstalled": "Not installed",
-                  "statusNotAuthenticated": "Not authenticated"
+                  "statusNotAuthenticated": "Not authenticated",
+                  "giteaViaPrefix": "Pull requests, Actions jobs, and comments via the",
+                  "giteaUnavailable": "Gitea CLI status is not available in this runtime yet.",
+                  "giteaInstallHint": "Install the Gitea CLI (gt) to enable pull requests, Actions jobs, and comments.",
+                  "giteaInstall": "Install Gitea CLI",
+                  "giteaLoginHint": "The Gitea CLI is installed but has no login for your server. Run this command in a terminal:",
+                  "giteaLoginCommand": "gt auth login --host <gitea-url>"
                 }
               }
             }
@@ -11703,16 +11709,6 @@
                 "cards": {
                   "793a06e899": "Re-check",
                   "1a9475dace": "Learn more",
-                  "19fb419c12": "Gitea credentials are configured but could not authenticate. Check the token, API base URL, and repository permissions, then restart Orca if environment variables changed.",
-                  "60708f23da": "only when Orca cannot derive the API URL from the remote.",
-                  "709057ad91": "ORCA_GITEA_API_BASE_URL",
-                  "6da9dfa5de": "for private repositories, and set",
-                  "6d5c2a3005": "ORCA_GITEA_TOKEN",
-                  "fcbe0469fd": "Public repositories are detected from their git remote. Set",
-                  "0613928cb3": "Gitea status is not available in this runtime yet.",
-                  "05863d2599": "Pull requests and commit statuses via the Gitea REST API.",
-                  "52f75876be": "Pull requests and commit statuses for detected repositories",
-                  "0b5242f8a2": "{{value0}} · Pull requests and commit statuses",
                   "40f678df73": "Azure DevOps credentials are configured but could not authenticate. Check the token, API base URL, and repository permissions, then restart Orca if environment variables changed.",
                   "7bd345e3f6": "only when Orca cannot derive the API base URL from the git remote.",
                   "186a6689df": "ORCA_AZURE_DEVOPS_API_BASE_URL",

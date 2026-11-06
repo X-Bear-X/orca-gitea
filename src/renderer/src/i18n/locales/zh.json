@@ -10725,7 +10725,13 @@
                   "statusConnected": "已连接",
                   "statusUnavailable": "不可用",
                   "statusNotInstalled": "未安装",
-                  "statusNotAuthenticated": "未经过验证"
+                  "statusNotAuthenticated": "未经过验证",
+                  "giteaViaPrefix": "通过",
+                  "giteaUnavailable": "当前运行环境暂不支持查看 Gitea CLI 状态。",
+                  "giteaInstallHint": "安装 Gitea CLI（gt）以启用 pull request、Actions 任务和评论。",
+                  "giteaInstall": "安装 Gitea CLI",
+                  "giteaLoginHint": "Gitea CLI 已安装，但还没有登录你的服务器。请在终端中运行此命令：",
+                  "giteaLoginCommand": "gt auth login --host <gitea-url>"
                 }
               }
             }
@@ -10774,16 +10780,6 @@
                 "cards": {
                   "793a06e899": "重新检查",
                   "1a9475dace": "了解更多",
-                  "19fb419c12": "Gitea 凭据已配置但无法通过身份验证。请检查 token、API 基础 URL 和仓库权限；如果环境变量已更改，请重启 Orca。",
-                  "60708f23da": "仅当 Orca 无法从 remote 推导出 API URL 时。",
-                  "709057ad91": "ORCA_GITEA_API_BASE_URL",
-                  "6da9dfa5de": "用于私有仓库，并设置",
-                  "6d5c2a3005": "ORCA_GITEA_TOKEN",
-                  "fcbe0469fd": "公开仓库会从其 git remote 检测。设置",
-                  "0613928cb3": "此运行时暂不支持 Gitea 状态。",
-                  "05863d2599": "通过 Gitea REST API 获取 pull request 和 commit 状态。",
-                  "52f75876be": "已检测仓库的 pull request 和 commit 状态",
-                  "0b5242f8a2": "{{value0}} · 拉取请求和提交状态",
                   "40f678df73": "Azure DevOps 凭据已配置但无法通过身份验证。请检查 token、API 基础 URL 和仓库权限；如果环境变量已更改，请重启 Orca。",
                   "7bd345e3f6": "仅当 Orca 无法从 git remote 推导出 API 基础 URL 时。",
                   "186a6689df": "ORCA_AZURE_DEVOPS_API_BASE_URL",

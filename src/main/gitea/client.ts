@@ -13,7 +13,13 @@ import {
   getHostedReviewLocalGitOptions,
   type HostedReviewExecutionOptions
 } from '../source-control/hosted-review-git-options'
-import { cancelUnreadResponseBody } from '../lib/unread-response-body'
+import { giteaEnvToken, giteaRequest } from './transport'
+import {
+  getGiteaCliState,
+  giteaCliAccountLabel,
+  giteaCliAuthFields,
+  type GiteaCliAuthFields
+} from './cli-logins'
 
 const REQUEST_TIMEOUT_MS = 5000
 // Forgejo may spend several seconds loading reviewers for one pulls page.
@@ -32,7 +38,7 @@ export type GiteaAuthStatus = {
   account: string | null
   baseUrl: string | null
   tokenConfigured: boolean
-}
+} & GiteaCliAuthFields
 
 type RequestOptions = {
   searchParams?: Record<string, string | number>
@@ -51,7 +57,7 @@ export function normalizeGiteaApiBaseUrl(value: string): string {
   return /\/api\/v1$/i.test(trimmed) ? trimmed : `${trimmed}/api/v1`
 }
 
-function getAuthConfig(): GiteaAuthConfig {
+export function getAuthConfig(): GiteaAuthConfig {
   const apiBaseUrl = envValue('ORCA_GITEA_API_BASE_URL')
   return {
     apiBaseUrl: apiBaseUrl ? normalizeGiteaApiBaseUrl(apiBaseUrl) : null,
@@ -59,22 +65,8 @@ function getAuthConfig(): GiteaAuthConfig {
   }
 }
 
-function authHeaders(config: Pick<GiteaAuthConfig, 'token'>): Record<string, string> {
-  return config.token ? { Authorization: `token ${config.token}` } : {}
-}
-
-function configuredApiBaseUrl(repo: GiteaRepoRef): string {
+export function configuredApiBaseUrl(repo: GiteaRepoRef): string {
   return getAuthConfig().apiBaseUrl ?? repo.apiBaseUrl
-}
-
-function apiUrl(baseUrl: string, path: string, searchParams?: RequestOptions['searchParams']): URL {
-  const url = new URL(`${baseUrl.replace(/\/+$/, '')}${path}`)
-  if (searchParams) {
-    for (const [key, value] of Object.entries(searchParams)) {
-      url.searchParams.set(key, String(value))
-    }
-  }
-  return url
 }
 
 async function requestJsonAtBase<T>(
@@ -84,24 +76,19 @@ async function requestJsonAtBase<T>(
   // Creation needs transport/auth failures distinguished from confirmed absence.
   throwOnFailure = false
 ): Promise<T | null> {
-  const config = getAuthConfig()
   try {
-    const response = await fetch(apiUrl(baseUrl, path, options.searchParams), {
-      headers: {
-        Accept: 'application/json',
-        ...authHeaders(config)
-      },
-      signal: AbortSignal.timeout(options.timeoutMs ?? REQUEST_TIMEOUT_MS)
+    const response = await giteaRequest(baseUrl, path, {
+      searchParams: options.searchParams,
+      timeoutMs: options.timeoutMs ?? REQUEST_TIMEOUT_MS
     })
-    if (!response.ok) {
-      await cancelUnreadResponseBody(response)
+    if (response.status < 200 || response.status >= 300) {
       // Why: listing 404s still signal repository or access failures.
       if (throwOnFailure && !(options.allowNotFound && response.status === 404)) {
         throw new Error(`Gitea request failed: HTTP ${response.status}`)
       }
       return null
     }
-    return (await response.json()) as T
+    return JSON.parse(response.text) as T
   } catch (error) {
     if (throwOnFailure) {
       throw error
@@ -110,7 +97,7 @@ async function requestJsonAtBase<T>(
   }
 }
 
-function requestJson<T>(
+export function requestJson<T>(
   repo: GiteaRepoRef,
   path: string,
   options: RequestOptions = {},
@@ -119,7 +106,7 @@ function requestJson<T>(
   return requestJsonAtBase(configuredApiBaseUrl(repo), path, options, throwOnFailure)
 }
 
-function encodedRepoPath(repo: GiteaRepoRef): string {
+export function encodedRepoPath(repo: GiteaRepoRef): string {
   return `${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}`
 }
 
@@ -165,7 +152,26 @@ function matchesBranch(raw: RawGiteaPullRequest, branchName: string): boolean {
   return label === branchName || label?.endsWith(`:${branchName}`) === true
 }
 
-export async function getGiteaAuthStatus(): Promise<GiteaAuthStatus> {
+export async function getGiteaAuthStatus(
+  options: { force?: boolean } = {}
+): Promise<GiteaAuthStatus> {
+  const cli = await getGiteaCliState(options)
+  if (cli.logins.length > 0) {
+    return {
+      configured: true,
+      authenticated: true,
+      account: giteaCliAccountLabel(cli.logins),
+      baseUrl: cli.logins[0].url,
+      tokenConfigured: giteaEnvToken() !== null,
+      ...giteaCliAuthFields(cli)
+    }
+  }
+  return { ...(await getGiteaTokenAuthStatus()), ...giteaCliAuthFields(cli) }
+}
+
+type GiteaTokenAuthStatus = Omit<GiteaAuthStatus, keyof GiteaCliAuthFields>
+
+async function getGiteaTokenAuthStatus(): Promise<GiteaTokenAuthStatus> {
   const config = getAuthConfig()
   const tokenConfigured = config.token !== null
   if (!config.apiBaseUrl && !tokenConfigured) {

@@ -15,7 +15,7 @@ import { usePreflightCardStatuses } from './source-control-preflight-card-status
 import { translate } from '@/i18n/i18n'
 import { openAppHttpLink } from '@/lib/app-http-link-open'
 
-function integrationStatusLabel(
+export function integrationStatusLabel(
   status: 'connected' | 'unavailable' | 'not-installed' | 'not-authenticated' | 'checking'
 ): string {
   switch (status) {
@@ -44,7 +44,7 @@ function integrationStatusLabel(
   }
 }
 
-function ProviderAccountScopeDetails({
+export function ProviderAccountScopeDetails({
   children
 }: {
   children?: React.ReactNode

@@ -8,47 +8,62 @@ import {
   normalizeHostedReviewBaseRef,
   normalizeHostedReviewHeadRef
 } from '../../shared/source-control/hosted-review/hosted-review-refs'
-import {
-  HostedReviewApiRequestError,
-  requestHostedReviewJson
-} from '../source-control/hosted-review-api-request'
+import { HostedReviewApiRequestError } from '../source-control/hosted-review-api-request'
 import { readHostedPullRequestTemplate } from '../source-control/pull-request-template'
-import { getGiteaPullRequestForBranch, invalidateGiteaPullRequestScanForRepo } from './client'
+import {
+  configuredApiBaseUrl,
+  getGiteaPullRequestForBranch,
+  invalidateGiteaPullRequestScanForRepo
+} from './client'
+import { giteaEnvToken, giteaRequest, GiteaTransportError } from './transport'
+import { giteaCliLoginForApiBase } from './cli-logins'
 import { mapGiteaPullRequest, type RawGiteaPullRequest } from './pull-request-mappers'
 import { getGiteaRepoRef, type GiteaRepoRef } from './repository-ref'
 
 const CREATE_REQUEST_TIMEOUT_MS = 60_000
 
-function envValue(name: string): string | null {
-  const value = process.env[name]?.trim() ?? ''
-  return value.length > 0 ? value : null
-}
-
-function normalizeApiBaseUrl(value: string): string {
-  const trimmed = value.trim().replace(/\/+$/, '')
-  return /\/api\/v1$/i.test(trimmed) ? trimmed : `${trimmed}/api/v1`
-}
-
-function configuredApiBaseUrl(repo: GiteaRepoRef): string {
-  const configured = envValue('ORCA_GITEA_API_BASE_URL')
-  return configured ? normalizeApiBaseUrl(configured) : repo.apiBaseUrl
-}
-
-export function isGiteaReviewCreationAuthenticated(): boolean {
-  return envValue('ORCA_GITEA_TOKEN') !== null
-}
-
-function authHeaders(): Record<string, string> {
-  const token = envValue('ORCA_GITEA_TOKEN')
-  return token ? { Authorization: `token ${token}` } : {}
-}
-
-function apiUrl(repo: GiteaRepoRef, path: string): URL {
-  return new URL(`${configuredApiBaseUrl(repo).replace(/\/+$/, '')}${path}`)
+/** Like glab auth status: a gt (or tea) login for this host, or the legacy ORCA_GITEA_TOKEN fallback. */
+export async function isGiteaReviewCreationAuthenticated(
+  repoPath: string,
+  connectionId?: string | null
+): Promise<boolean> {
+  if (giteaEnvToken() !== null) {
+    return true
+  }
+  try {
+    const repo = await getGiteaRepoRef(repoPath, connectionId)
+    return repo ? (await giteaCliLoginForApiBase(configuredApiBaseUrl(repo))) !== null : false
+  } catch {
+    return false
+  }
 }
 
 function encodedRepoPath(repo: GiteaRepoRef): string {
   return `${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}`
+}
+
+async function postPullRequest(
+  repo: GiteaRepoRef,
+  requestBody: Record<string, unknown>
+): Promise<RawGiteaPullRequest> {
+  try {
+    const response = await giteaRequest(
+      configuredApiBaseUrl(repo),
+      `/repos/${encodedRepoPath(repo)}/pulls`,
+      { method: 'POST', body: requestBody, timeoutMs: CREATE_REQUEST_TIMEOUT_MS }
+    )
+    if (response.status < 200 || response.status >= 300) {
+      throw new HostedReviewApiRequestError(response.text || `HTTP ${response.status}`, {
+        status: response.status
+      })
+    }
+    return JSON.parse(response.text) as RawGiteaPullRequest
+  } catch (error) {
+    if (error instanceof GiteaTransportError) {
+      throw new HostedReviewApiRequestError(error.message, { timedOut: error.timedOut })
+    }
+    throw error
+  }
 }
 
 function apiErrorMessage(error: unknown): string {
@@ -73,7 +88,7 @@ function classifyCreateError(error: unknown): CreateHostedReviewResult {
       ok: false,
       code: 'auth_required',
       error:
-        'Create PR failed: Gitea is not authenticated. Next step: set ORCA_GITEA_TOKEN in this environment.',
+        'Create PR failed: Gitea is not authenticated. Next step: run gt auth login in this environment.',
       reason: 'auth_required'
     }
   }
@@ -184,19 +199,7 @@ export async function createGiteaPullRequest(
   }
 
   try {
-    const raw = await requestHostedReviewJson<RawGiteaPullRequest>(
-      apiUrl(repo, `/repos/${encodedRepoPath(repo)}/pulls`),
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          ...authHeaders()
-        },
-        body: JSON.stringify(requestBody)
-      },
-      CREATE_REQUEST_TIMEOUT_MS
-    )
+    const raw = await postPullRequest(repo, requestBody)
     const created = mapGiteaPullRequest(raw, 'neutral')
     if (created) {
       invalidateGiteaPullRequestScanForRepo(repo)

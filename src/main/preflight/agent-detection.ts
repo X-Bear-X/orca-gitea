@@ -60,6 +60,9 @@ export type PreflightStatus = {
     account: string | null
     baseUrl: string | null
     tokenConfigured: boolean
+    cliInstalled?: boolean
+    cliAuthenticated?: boolean
+    cli?: 'gt' | 'tea' | null
   }
 }
 
@@ -282,7 +285,7 @@ async function executePreflightCheck(
     glabProbe.installed ? isGlabAuthenticated(glabProbe) : Promise.resolve(false),
     getBitbucketAuthStatus(),
     getAzureDevOpsAuthStatus(),
-    getGiteaAuthStatus()
+    getGiteaAuthStatus({ force })
   ])
 
   return {

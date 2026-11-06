@@ -7,6 +7,11 @@ vi.mock('../git/command-runner/git-exec-file', async (importOriginal) => ({
     stderr: ''
   }))
 }))
+vi.mock('../git/command-runner/gitea-cli-exec-file', () => ({
+  giteaCliExecFileAsync: vi.fn(async (command: string) => {
+    throw Object.assign(new Error(`spawn ${command} ENOENT`), { code: 'ENOENT' })
+  })
+}))
 vi.mock('../source-control/pull-request-template', () => ({
   readHostedPullRequestTemplate: vi.fn(async () => '')
 }))

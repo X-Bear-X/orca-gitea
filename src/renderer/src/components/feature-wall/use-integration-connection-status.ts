@@ -117,7 +117,12 @@ function isAzureDevOpsReviewConfigured(status: TokenReviewStatus | undefined): b
   return true
 }
 
-function isGiteaReviewConfigured(status: TokenReviewStatus | undefined): boolean {
+function isGiteaReviewConfigured(
+  status: (TokenReviewStatus & { cliAuthenticated?: boolean }) | undefined
+): boolean {
+  if (status?.cliAuthenticated === true) {
+    return true
+  }
   if (status?.configured !== true) {
     return false
   }

@@ -184,7 +184,9 @@ export function getVisibleHostedReviewRefreshTargets(
         state: review?.state,
         checksStatus: usePR ? prEntry.data?.checksStatus : hostedEntry?.data?.status,
         hasReview: review ? true : fetchedAt !== null ? false : null,
-        selected
+        selected,
+        provider: usePR ? 'github' : hostedEntry?.data?.provider,
+        unchangedReads: usePR ? undefined : hostedEntry?.unchangedReads
       }),
       refresh: async (force = true) => {
         const before = getState()

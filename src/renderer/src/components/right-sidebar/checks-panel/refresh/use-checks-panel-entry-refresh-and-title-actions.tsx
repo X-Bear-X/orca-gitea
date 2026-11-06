@@ -1,6 +1,7 @@
 import { getRepoExecutionHostId } from '../../../../../../shared/execution-host'
 import { forgeOwnerHostIdForWorkspace } from '@/runtime/source-control/forge/forge-credential-target'
 import { gitLabApiFor } from '@/runtime/repository-gitlab/gitlab-owner-api'
+import { hostedDetailsReviewOr } from '../gitea-review-client'
 import React, { useCallback, useEffect, useRef } from 'react'
 import { ENTRY_REFRESH_GRACE_MS, shouldEntryRefresh } from './checks-entry-refresh'
 import { refreshHostedReviewCard } from '@/store/slices/hosted-review/hosted-review-card-refresh'
@@ -228,8 +229,7 @@ export function useChecksPanelEntryRefreshAndTitleActions(
         linkedAzureDevOpsPR,
         linkedGiteaPR
       }).catch(() => null)
-      const refreshedGitLabReview =
-        refreshedReview?.provider === 'gitlab' ? refreshedReview : activeGitLabReview
+      const refreshedGitLabReview = hostedDetailsReviewOr(refreshedReview, activeGitLabReview)
       if (refreshedGitLabReview) {
         await fetchGitLabDetails({
           mrNumberOverride: refreshedGitLabReview.number,

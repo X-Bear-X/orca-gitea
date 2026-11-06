@@ -16,7 +16,7 @@ import { translate } from '@/i18n/i18n'
 import { useTranslate, type Translate } from '@/i18n/use-translate'
 import { openAppHttpLink } from '@/lib/browser/navigation/app-http-link-open'
 
-function integrationStatusLabel(
+export function integrationStatusLabel(
   status: 'connected' | 'unavailable' | 'not-installed' | 'not-authenticated' | 'checking',
   t: Translate = translate
 ): string {
@@ -46,7 +46,7 @@ function integrationStatusLabel(
   }
 }
 
-function ProviderAccountScopeDetails({
+export function ProviderAccountScopeDetails({
   children
 }: {
   children?: React.ReactNode

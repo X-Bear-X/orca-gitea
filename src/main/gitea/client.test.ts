@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { cancelTrackingResponse } from '../lib/unread-response-body.test-fixtures'
 
-const { gitExecFileAsyncMock } = vi.hoisted(() => ({
-  gitExecFileAsyncMock: vi.fn()
+const { gitExecFileAsyncMock, giteaCliExecFileAsyncMock } = vi.hoisted(() => ({
+  gitExecFileAsyncMock: vi.fn(),
+  giteaCliExecFileAsyncMock: vi.fn()
+}))
+
+vi.mock('../git/command-runner/gitea-cli-exec-file', () => ({
+  giteaCliExecFileAsync: giteaCliExecFileAsyncMock
 }))
 
 vi.mock('../git/command-runner/git-exec-file', async (importOriginal) => ({
@@ -11,6 +16,7 @@ vi.mock('../git/command-runner/git-exec-file', async (importOriginal) => ({
 }))
 import { getGiteaPullRequestForBranch, getGiteaPullRequestForBranchOrThrow } from './client'
 import { _resetGiteaRepoRefCache } from './repository-ref'
+import { _resetGiteaCliStateCache } from './cli-logins'
 import {
   _getGiteaPullRequestScanCacheSize,
   _resetGiteaPullRequestScanCache
@@ -58,6 +64,11 @@ describe('Gitea client', () => {
       stderr: ''
     })
     _resetGiteaRepoRefCache()
+    _resetGiteaCliStateCache()
+    giteaCliExecFileAsyncMock.mockReset()
+    giteaCliExecFileAsyncMock.mockImplementation(async (command: string) => {
+      throw Object.assign(new Error(`spawn ${command} ENOENT`), { code: 'ENOENT' })
+    })
     _resetGiteaPullRequestScanCache()
     __resetRepoDefaultBranchCacheForTests()
     vi.unstubAllGlobals()

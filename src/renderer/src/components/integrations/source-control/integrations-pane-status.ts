@@ -4,7 +4,7 @@ export type GhStatus = 'checking' | 'connected' | 'not-installed' | 'not-authent
 export type GlabStatus = GhStatus
 export type BitbucketStatus = 'checking' | 'connected' | 'not-configured' | 'not-authenticated'
 export type AzureDevOpsStatus = 'checking' | 'configured' | 'not-configured' | 'not-authenticated'
-export type GiteaStatus = 'checking' | 'configured' | 'not-configured' | 'not-authenticated'
+export type GiteaStatus = GhStatus
 export type PreflightRefreshProvider = 'gh' | 'glab' | 'bitbucket' | 'azureDevOps' | 'gitea'
 
 export type PreflightIntegrationStatuses = {
@@ -18,6 +18,7 @@ export type PreflightIntegrationStatuses = {
   giteaStatus: GiteaStatus
   giteaAccount: string | null
   giteaBaseUrl: string | null
+  giteaCli: 'gt' | 'tea' | null
 }
 
 type TokenApiPreflightStatus = {
@@ -34,6 +35,9 @@ type GiteaPreflightStatus = {
   account: string | null
   baseUrl: string | null
   tokenConfigured: boolean
+  cliInstalled?: boolean
+  cliAuthenticated?: boolean
+  cli?: 'gt' | 'tea' | null
 }
 
 export function tokenApiStatusFromPreflight(
@@ -51,14 +55,15 @@ export function tokenApiStatusFromPreflight(
   return 'configured'
 }
 
+/** Mirrors glab: tea logins connect; ORCA_GITEA_TOKEN remains a legacy way to connect. */
 export function giteaStatusFromPreflight(status: GiteaPreflightStatus | undefined): GiteaStatus {
-  if (!status?.configured) {
-    return 'not-configured'
+  if (status?.cliAuthenticated) {
+    return 'connected'
   }
-  if (status.tokenConfigured && !status.authenticated) {
-    return 'not-authenticated'
+  if (status?.tokenConfigured) {
+    return status.authenticated ? 'connected' : 'not-authenticated'
   }
-  return 'configured'
+  return status?.cliInstalled ? 'not-authenticated' : 'not-installed'
 }
 
 function ghStatusFromPreflight(status: PreflightStatus['gh']): GhStatus {
@@ -105,7 +110,8 @@ export function getPreflightIntegrationStatuses(
       azureDevOpsBaseUrl: null,
       giteaStatus: 'checking',
       giteaAccount: null,
-      giteaBaseUrl: null
+      giteaBaseUrl: null,
+      giteaCli: null
     }
   }
 
@@ -134,6 +140,7 @@ export function getPreflightIntegrationStatuses(
     azureDevOpsBaseUrl: azureDevOps?.baseUrl ?? null,
     giteaStatus: maybeChecking('gitea', refreshingProviders, giteaStatusFromPreflight(gitea)),
     giteaAccount: gitea?.account ?? null,
-    giteaBaseUrl: gitea?.baseUrl ?? null
+    giteaBaseUrl: gitea?.baseUrl ?? null,
+    giteaCli: gitea?.cli ?? null
   }
 }

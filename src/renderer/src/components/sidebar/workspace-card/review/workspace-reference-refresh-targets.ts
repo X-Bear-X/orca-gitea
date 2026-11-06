@@ -72,7 +72,9 @@ export function getWorkspaceReferenceRefreshTargets(
           state: review?.state,
           checksStatus: review?.status,
           hasReview: review ? true : null,
-          selected
+          selected,
+          provider: review?.provider,
+          unchangedReads: entry?.unchangedReads
         }),
         refresh: (_force, signal) =>
           withTimeout(

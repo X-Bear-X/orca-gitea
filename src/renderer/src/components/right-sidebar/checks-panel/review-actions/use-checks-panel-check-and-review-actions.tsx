@@ -13,6 +13,7 @@ import {
 
 import { loadGitLabJobLogDetails } from '@/runtime/repository-gitlab/gitlab-job-trace-client'
 import { startFixChecksAgent } from '@/lib/source-control/checks/fix-checks-agent-launch'
+import { loadGiteaJobLogDetails } from '@/runtime/repository-gitea/gitea-job-log-client'
 import { openChecksPanelHostedReviewUrl } from './checks-panel-hosted-review-click-routing'
 import { isMacPlatform } from '../../../terminal-pane/links/terminal-link-open-hints'
 import { translate } from '@/i18n/i18n'
@@ -82,6 +83,18 @@ export function useChecksPanelCheckAndReviewActions(model: ChecksPanelCheckAndRe
       const checkRunDetailsByCheckKey = await collectFixChecksPromptDetails(
         fixChecks,
         async (check) => {
+          if (check.giteaJobId) {
+            try {
+              return await loadGiteaJobLogDetails({
+                repoPath: repo.path,
+                repoId: repo.id,
+                repoOwnerExecutionHostId: forgeOwnerHostIdForWorkspace(repo, activeWorktree),
+                check
+              })
+            } catch {
+              return null
+            }
+          }
           const isGitLabJob = Boolean(check.gitlabJobId)
           if (
             !isGitLabJob &&

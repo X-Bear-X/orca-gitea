@@ -24,6 +24,9 @@ export const preflightApi = {
       account: string | null
       baseUrl: string | null
       tokenConfigured: boolean
+      cliInstalled?: boolean
+      cliAuthenticated?: boolean
+      cli?: 'gt' | 'tea' | null
     }
     linear: { connected: boolean }
   }> => ipcRenderer.invoke('preflight:check', args),

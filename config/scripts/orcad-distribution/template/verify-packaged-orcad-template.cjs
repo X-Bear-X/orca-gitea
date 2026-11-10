@@ -156,8 +156,23 @@ function verifyTarget(resourcesDir, templateDir, target, value, schemaVersion) {
   requireExactNames(listFiles(targetDir), inventory, `${target} file inventory`)
 }
 
+/** Local builds may opt into a partial template (e.g. darwin-arm64) for their own SSH hosts; releases never. */
+function packagedOrcadTemplateTargets(env = process.env) {
+  const requested = (env.ORCA_ORCAD_TEMPLATE_TARGETS ?? '').split(',').filter(Boolean)
+  if (requested.length === 0) {
+    return ORCAD_TEMPLATE_TARGETS
+  }
+  const unknown = requested.filter((target) => !ORCAD_TEMPLATE_TARGETS.includes(target))
+  if (env.ORCA_REQUIRE_ORCAD_TEMPLATE === '1' || unknown.length > 0) {
+    throw new Error(
+      `[verify-packaged-orcad-template] ORCA_ORCAD_TEMPLATE_TARGETS must be a subset of ${ORCAD_TEMPLATE_TARGETS.join(',')} and is refused for release templates`
+    )
+  }
+  return [...new Set(requested)]
+}
+
 /** `targets` narrows the inventory for a CI-only partial template; packaging checks them all. */
-function verifyPackagedOrcadTemplate(resourcesDir, targets = ORCAD_TEMPLATE_TARGETS) {
+function verifyPackagedOrcadTemplate(resourcesDir, targets = packagedOrcadTemplateTargets()) {
   const templateDir = join(resourcesDir, 'orcad-template')
   const manifest = requireRecord(readManifest(templateDir), 'manifest')
   if (![TEMPLATE_SCHEMA_VERSION, 4].includes(manifest.schemaVersion)) {

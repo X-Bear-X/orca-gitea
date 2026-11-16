@@ -29,11 +29,19 @@ export type JiraTaskProviderIdentity = {
   projectKey?: string | null
 }
 
+export type QunliTaskProviderIdentity = {
+  provider: 'qunli'
+  accountId?: string | null
+  accountName?: string | null
+  projectId?: string | null
+}
+
 export type TaskProviderIdentity =
   | GitHubTaskProviderIdentity
   | GitLabTaskProviderIdentity
   | LinearTaskProviderIdentity
   | JiraTaskProviderIdentity
+  | QunliTaskProviderIdentity
 
 export function normalizeTaskProviderIdentity(
   provider: TaskProvider,
@@ -79,6 +87,13 @@ export function normalizeTaskProviderIdentity(
         siteUrl: normalizeNonEmptyString(raw.siteUrl),
         projectKey: normalizeNonEmptyString(raw.projectKey)
       }
+    case 'qunli':
+      return {
+        provider,
+        accountId: normalizeNonEmptyString(raw.accountId),
+        accountName: normalizeNonEmptyString(raw.accountName),
+        projectId: normalizeNonEmptyString(raw.projectId)
+      }
   }
 }
 
@@ -112,6 +127,10 @@ export function isStoredTaskProviderIdentity(provider: TaskProvider, identity: u
       )
     case 'jira':
       return ['siteId', 'siteUrl', 'projectKey'].every((key) => isNullableOptionalString(raw[key]))
+    case 'qunli':
+      return ['accountId', 'accountName', 'projectId'].every((key) =>
+        isNullableOptionalString(raw[key])
+      )
   }
 }
 
@@ -119,7 +138,8 @@ const TASK_PROVIDER_IDENTITY_FIELDS: Record<TaskProvider, readonly string[]> = {
   github: ['owner', 'repo', 'host'],
   gitlab: ['projectId', 'namespace', 'project', 'webUrl'],
   linear: ['workspaceId', 'workspaceName', 'teamId', 'teamKey'],
-  jira: ['siteId', 'siteUrl', 'projectKey']
+  jira: ['siteId', 'siteUrl', 'projectKey'],
+  qunli: ['accountId', 'accountName', 'projectId']
 }
 
 export function areTaskProviderIdentitiesEqual(
@@ -157,6 +177,8 @@ export function taskProviderIdentityCachePart(
       return [identity.workspaceId, identity.teamId ?? identity.teamKey].filter(Boolean).join('/')
     case 'jira':
       return [identity.siteId ?? identity.siteUrl, identity.projectKey].filter(Boolean).join('/')
+    case 'qunli':
+      return [identity.accountId, identity.projectId].filter(Boolean).join('/')
   }
 }
 

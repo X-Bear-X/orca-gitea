@@ -26,6 +26,7 @@ export function normalizeWorkspaceAttachment(value: unknown): WorkspaceAttachmen
     provider !== 'gitlab' &&
     provider !== 'linear' &&
     provider !== 'jira' &&
+    provider !== 'qunli' &&
     provider !== 'bitbucket' &&
     provider !== 'azure-devops' &&
     provider !== 'gitea'
@@ -36,7 +37,7 @@ export function normalizeWorkspaceAttachment(value: unknown): WorkspaceAttachmen
   if (type !== 'issue' && type !== 'pr' && type !== 'mr') {
     return null
   }
-  if ((provider === 'linear' || provider === 'jira') && type !== 'issue') {
+  if ((provider === 'linear' || provider === 'jira' || provider === 'qunli') && type !== 'issue') {
     return null
   }
   if (type === 'mr' && provider !== 'gitlab') {
@@ -46,8 +47,14 @@ export function normalizeWorkspaceAttachment(value: unknown): WorkspaceAttachmen
     return null
   }
   const identifier =
-    nonEmpty(raw.identifier) ?? nonEmpty(raw.linearIdentifier) ?? nonEmpty(raw.jiraIdentifier)
-  if (raw.number === 0 && (!identifier || (provider !== 'linear' && provider !== 'jira'))) {
+    nonEmpty(raw.identifier) ??
+    nonEmpty(raw.linearIdentifier) ??
+    nonEmpty(raw.jiraIdentifier) ??
+    nonEmpty(raw.qunliIdentifier)
+  if (
+    raw.number === 0 &&
+    (!identifier || (provider !== 'linear' && provider !== 'jira' && provider !== 'qunli'))
+  ) {
     return null
   }
   if (raw.url !== undefined) {
@@ -73,6 +80,7 @@ export function normalizeWorkspaceAttachment(value: unknown): WorkspaceAttachmen
     ...(nonEmpty(raw.repoId) ? { repoId: nonEmpty(raw.repoId) } : {}),
     ...(nonEmpty(raw.linearIdentifier) ? { linearIdentifier: nonEmpty(raw.linearIdentifier) } : {}),
     ...(nonEmpty(raw.jiraIdentifier) ? { jiraIdentifier: nonEmpty(raw.jiraIdentifier) } : {}),
+    ...(nonEmpty(raw.qunliIdentifier) ? { qunliIdentifier: nonEmpty(raw.qunliIdentifier) } : {}),
     ...(nonEmpty(raw.linearWorkspaceId)
       ? { linearWorkspaceId: nonEmpty(raw.linearWorkspaceId) }
       : {}),
@@ -84,7 +92,8 @@ export function normalizeWorkspaceAttachment(value: unknown): WorkspaceAttachmen
   const linkedItem = normalizeWorkspaceLinkedItem({
     ...item,
     title: item.title ?? identifier ?? String(item.number),
-    jiraIdentifier: item.jiraIdentifier ?? (provider === 'jira' ? identifier : undefined)
+    jiraIdentifier: item.jiraIdentifier ?? (provider === 'jira' ? identifier : undefined),
+    qunliIdentifier: item.qunliIdentifier ?? (provider === 'qunli' ? identifier : undefined)
   })
   if (
     context &&
@@ -101,8 +110,12 @@ function attachmentIdentity(item: WorkspaceAttachment): string {
   return JSON.stringify([
     item.provider,
     item.type,
-    item.provider === 'linear' || item.provider === 'jira'
-      ? (item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier ?? item.number)
+    item.provider === 'linear' || item.provider === 'jira' || item.provider === 'qunli'
+      ? (item.identifier ??
+        item.linearIdentifier ??
+        item.jiraIdentifier ??
+        item.qunliIdentifier ??
+        item.number)
       : item.number
   ])
 }
@@ -294,6 +307,8 @@ export function toWorkspaceLinkedItem(
     ...item,
     linearIdentifier:
       item.linearIdentifier ?? (item.provider === 'linear' ? item.identifier : undefined),
-    jiraIdentifier: item.jiraIdentifier ?? (item.provider === 'jira' ? item.identifier : undefined)
+    jiraIdentifier: item.jiraIdentifier ?? (item.provider === 'jira' ? item.identifier : undefined),
+    qunliIdentifier:
+      item.qunliIdentifier ?? (item.provider === 'qunli' ? item.identifier : undefined)
   })
 }

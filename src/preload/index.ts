@@ -34,6 +34,7 @@ import { bitbucketApi } from './api/hosted-review/bitbucket-bridge'
 import { giteaApi } from './api/gitea/gitea-bridge'
 import { linearApi } from './api/work-items/linear-bridge'
 import { jiraApi } from './api/work-items/jira-bridge'
+import { qunliApi } from './api/work-items/qunli-bridge'
 import { starNagApi } from './api/onboarding/star-nag-bridge'
 import { diagnosticsApi } from './api/diagnostics/diagnostics-bridge'
 import { settingsApi } from './api/preferences/settings-bridge'
@@ -140,6 +141,7 @@ const api = {
   gitea: giteaApi,
   linear: linearApi,
   jira: jiraApi,
+  qunli: qunliApi,
   starNag: starNagApi,
   telemetryTrack: telemetryTrackApi,
   telemetrySetOptIn: telemetrySetOptInApi,

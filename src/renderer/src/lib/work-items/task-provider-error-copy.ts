@@ -131,7 +131,20 @@ const COPY: Record<TaskProviderErrorCode, () => string> = {
     translate(
       'taskProviders.errors.jira.invalidCloudId',
       'The site did not report a valid Atlassian cloud ID.'
-    )
+    ),
+  'qunli.notConnected': () =>
+    translate('taskProviders.errors.qunli.notConnected', 'Not connected to Qunli.'),
+  'qunli.apiKeyRequired': () =>
+    translate('taskProviders.errors.qunli.apiKeyRequired', 'Paste the API key of a Qunli agent.'),
+  'qunli.connectionFailed': () =>
+    translate('taskProviders.errors.qunli.connectionFailed', 'Could not connect to Qunli.'),
+  'qunli.statusNotAllowed': () =>
+    translate(
+      'taskProviders.errors.qunli.statusNotAllowed',
+      'This task type cannot move to that status.'
+    ),
+  'qunli.updateFailed': () =>
+    translate('taskProviders.errors.qunli.updateFailed', 'Failed to update the Qunli task.')
 }
 
 const LEGACY_CODES: Record<string, TaskProviderErrorCode> = {

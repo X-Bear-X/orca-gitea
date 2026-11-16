@@ -42,6 +42,7 @@ import { createRateLimitsApi } from './preload-api/agents/web-rate-limits-api'
 import { createReposApi } from './preload-api/workspaces/web-repositories-api'
 import { createHooksApi, createRuntimeNamespaceApi } from './preload-api/web-review-api'
 import { createWebJiraApi } from './preload-api/jira/web-jira-api'
+import { createWebQunliApi } from './preload-api/qunli/web-qunli-api'
 import { callRuntimeResult } from './runtime/client/web-runtime-calls'
 import { createWebRuntimeApi } from './preload-api/runtime/web-runtime-api'
 import { createRuntimeEnvironmentsApi } from './preload-api/runtime/web-runtime-environments-api'
@@ -103,6 +104,7 @@ function createWebPreloadApi(): Omit<Partial<PreloadApi>, 'settings' | 'plugins'
     hostedReview: createRuntimeNamespaceApi('hostedReview'),
     linear: createRuntimeNamespaceApi('linear'),
     jira: createWebJiraApi(),
+    qunli: createWebQunliApi(),
     hooks: createHooksApi(),
     stats: {
       getSummary: async () =>

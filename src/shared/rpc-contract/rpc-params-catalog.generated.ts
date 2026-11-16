@@ -552,6 +552,13 @@ import {
   RepoSparsePresetSave,
   RepoUpdate
 } from './projects/repo-params'
+import {
+  QunliConnect,
+  QunliListTasks,
+  QunliMetadata,
+  QunliTaskRef,
+  QunliUpdateTaskStatus
+} from './qunli/qunli-params'
 import { ReferenceFind, ReferenceList } from './references/reference-params'
 import { BrowserTarget, ExpectUrlBrowserTarget } from './rpc-param-primitives'
 import { SessionTabsUnsubscribeAllParams } from './session-tabs/session-tabs-params'
@@ -1520,6 +1527,15 @@ export const RPC_PARAMS_BY_METHOD = {
   'projectHostSetup.list': null,
   'projectHostSetup.setupExistingFolder': ProjectHostSetupExistingFolder,
   'projectHostSetup.update': ProjectHostSetupUpdate,
+  'qunli.connect': QunliConnect,
+  'qunli.disconnect': null,
+  'qunli.getTask': QunliTaskRef,
+  'qunli.listTasks': QunliListTasks,
+  'qunli.metadata': QunliMetadata,
+  'qunli.status': null,
+  'qunli.taskComments': QunliTaskRef,
+  'qunli.testConnection': null,
+  'qunli.updateTaskStatus': QunliUpdateTaskStatus,
   'reference.find': ReferenceFind,
   'reference.list': ReferenceList,
   'repo.add': RepoPath,

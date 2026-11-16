@@ -25,6 +25,7 @@ import { COOKIE_ENVELOPE_PREFIX, getMiniMaxCookiePath } from '../../minimax/mini
 import { miniMaxApiKeyEnvelopeFile } from '../../minimax/minimax-api-key-store'
 import { openCodeGoApiKeyEnvelopeFile } from '../../opencode/accounts/opencode-go-api-key-store'
 import { openAiCompatibleSpeechProviderEnvelopeFile } from '../../speech/openai-compatible-speech-provider-store'
+import { qunliApiKeyEnvelopeFile } from '../../qunli/qunli-api-key-store'
 
 type PlaintextCredentialTarget = {
   path: string
@@ -61,7 +62,8 @@ function listPlaintextCredentialTargets(): PlaintextCredentialTarget[] {
     { path: getZcodePlanApiKeyPath(), envelopePrefix: API_KEY_ENVELOPE_PREFIX },
     miniMaxApiKeyEnvelopeFile(),
     openCodeGoApiKeyEnvelopeFile(),
-    openAiCompatibleSpeechProviderEnvelopeFile()
+    openAiCompatibleSpeechProviderEnvelopeFile(),
+    qunliApiKeyEnvelopeFile()
   ]
 }
 

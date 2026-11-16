@@ -3,7 +3,8 @@ import { translateSearchKeyword } from '../search/settings-search-keywords'
 import { createLocalizedCatalog } from '@/i18n/localized-catalog'
 import {
   JIRA_INTEGRATION_SECTION_ID,
-  LINEAR_INTEGRATION_SECTION_ID
+  LINEAR_INTEGRATION_SECTION_ID,
+  QUNLI_INTEGRATION_SECTION_ID
 } from '../../integrations/task-trackers/task-provider-integration-section-ids'
 
 // Provider rows carry these ids so search results can scroll to and highlight them.
@@ -14,7 +15,8 @@ export const INTEGRATION_SETTING_TARGET_IDS = {
   azuredevops: 'integrations-azure-devops',
   gitea: 'integrations-gitea',
   jira: JIRA_INTEGRATION_SECTION_ID,
-  linear: LINEAR_INTEGRATION_SECTION_ID
+  linear: LINEAR_INTEGRATION_SECTION_ID,
+  qunli: QUNLI_INTEGRATION_SECTION_ID
 } as const
 
 export const getIntegrationsPaneSearchEntries = createLocalizedCatalog(() => [
@@ -174,6 +176,18 @@ export const getIntegrationsPaneSearchEntries = createLocalizedCatalog(() => [
         'auto.components.settings.integrations.search.2ec2bd328c',
         'api token'
       )
+    ]
+  },
+  {
+    targetSectionId: INTEGRATION_SETTING_TARGET_IDS.qunli,
+    title: translate('taskProviders.qunli.searchTitle', 'Qunli integration'),
+    description: translate(
+      'taskProviders.qunli.searchDescription',
+      'Connect Qunli with an agent API key.'
+    ),
+    keywords: [
+      ...translateSearchKeyword('taskProviders.qunli.searchKeyword', 'qunli'),
+      ...translateSearchKeyword('taskProviders.qunli.searchKeywordCards', 'cards')
     ]
   },
   {

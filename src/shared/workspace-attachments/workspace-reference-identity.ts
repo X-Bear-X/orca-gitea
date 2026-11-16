@@ -1,3 +1,5 @@
+import { parseQunliReferenceUrl } from '../qunli/qunli-reference-url'
+import { qunliTaskUrl, QUNLI_TASK_REF_PATTERN } from '../qunli/qunli-task-ref'
 import { parseJiraIssueUrl, JIRA_ISSUE_KEY_PATTERN } from '../jira/jira-issue-url'
 import { parseLinearIssueInput, parseLinearIssueUrlIntent } from '../linear/links'
 import { getTaskSourceCacheScope } from '../work-items/task-source-context'
@@ -22,6 +24,9 @@ const PUBLIC_REFERENCE_HOSTS = new Set([
 function referenceHostProvider(host: string): WorkspaceAttachment['provider'] | undefined {
   if (host === 'linear.app') {
     return 'linear'
+  }
+  if (host === 'qunli.co') {
+    return 'qunli'
   }
   return PUBLIC_REFERENCE_HOSTS.has(host)
     ? (getPublicForgeProviderForHost(host) ?? undefined)
@@ -101,6 +106,10 @@ function parseReferenceRoute(
       url: url.href
     }
   }
+  const qunli = parseQunliReferenceUrl(url.href)
+  if (qunli) {
+    return qunli
+  }
   // Git hosts (and Bitbucket Server /repos/ file views) also serve /browse/KEY-1 paths.
   const jira =
     (!providerHint || providerHint === 'jira') && !url.pathname.includes('/repos/')
@@ -172,7 +181,7 @@ function parseReferenceRoute(
 }
 
 export function getWorkspaceReferenceIdentifier(item: WorkspaceAttachment): string | undefined {
-  return item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier
+  return item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier ?? item.qunliIdentifier
 }
 
 function externalUrl(item: WorkspaceAttachment): string | undefined {
@@ -197,6 +206,10 @@ function externalUrl(item: WorkspaceAttachment): string | undefined {
     case 'jira':
       return identity.siteUrl && identifier
         ? `${identity.siteUrl.replace(/\/+$/, '')}/browse/${identifier}`
+        : undefined
+    case 'qunli':
+      return identity.accountId && identifier
+        ? qunliTaskUrl(identity.accountId, identifier)
         : undefined
     case 'linear':
       return undefined
@@ -251,7 +264,11 @@ export function getWorkspaceReferenceIdentity(item: WorkspaceAttachment): string
 export function parseWorkspaceReferenceQuery(input: string): WorkspaceReferenceQuery {
   const value = input.trim()
   const linear = parseLinearIssueInput(value)
-  if (JIRA_ISSUE_KEY_PATTERN.test(value) || (linear && !value.includes('://'))) {
+  if (
+    JIRA_ISSUE_KEY_PATTERN.test(value) ||
+    QUNLI_TASK_REF_PATTERN.test(value) ||
+    (linear && !value.includes('://'))
+  ) {
     return { kind: 'issue-key', identifier: value.toUpperCase() }
   }
   try {

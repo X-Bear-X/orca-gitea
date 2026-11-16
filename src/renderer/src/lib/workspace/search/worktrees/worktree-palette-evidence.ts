@@ -229,7 +229,12 @@ export function buildWorktreePortEvidence(
 export function buildWorktreeAttachmentEvidence(
   item: WorkspaceAttachment
 ): PaletteComposedEvidence | null {
-  if (item.type !== 'issue' && item.provider !== 'linear' && item.provider !== 'jira') {
+  if (
+    item.type !== 'issue' &&
+    item.provider !== 'linear' &&
+    item.provider !== 'jira' &&
+    item.provider !== 'qunli'
+  ) {
     return buildWorktreeReviewEvidence({
       provider: item.provider,
       number: item.number,
@@ -239,7 +244,8 @@ export function buildWorktreeAttachmentEvidence(
   if (item.provider === 'github' || item.provider === 'gitlab') {
     return buildWorktreeIssueEvidence(item)
   }
-  const identifier = item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier ?? ''
+  const identifier =
+    item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier ?? item.qunliIdentifier ?? ''
   return composePaletteEvidence({
     id: `task:${identifier}`,
     kind: 'task',

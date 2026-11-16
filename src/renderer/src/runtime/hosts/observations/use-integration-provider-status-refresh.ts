@@ -14,6 +14,9 @@ export function useIntegrationProviderStatusRefresh(): void {
   const jiraStatusContextKey = useAppStore((s) => s.jiraStatusContextKey)
   const checkLinearConnection = useAppStore((s) => s.checkLinearConnection)
   const checkJiraConnection = useAppStore((s) => s.checkJiraConnection)
+  const qunliStatusChecked = useAppStore((s) => s.qunliStatusChecked)
+  const qunliStatusContextKey = useAppStore((s) => s.qunliStatusContextKey)
+  const checkQunliConnection = useAppStore((s) => s.checkQunliConnection)
   const refreshPreflightStatus = useAppStore((s) => s.refreshPreflightStatus)
   const expectedPreflightContextKey = useAppStore((s) =>
     localPreflightContextKey(getLocalPreflightContext(s))
@@ -22,6 +25,7 @@ export function useIntegrationProviderStatusRefresh(): void {
   const preflightStatusCurrent = preflightStatusContextKey === expectedPreflightContextKey
   const linearStatusCurrent = linearStatusContextKey === providerRuntimeContextKey
   const jiraStatusCurrent = jiraStatusContextKey === providerRuntimeContextKey
+  const qunliStatusCurrent = qunliStatusContextKey === providerRuntimeContextKey
 
   useEffect(() => {
     if (!linearStatusCurrent || !linearStatusChecked) {
@@ -30,12 +34,16 @@ export function useIntegrationProviderStatusRefresh(): void {
     if (!jiraStatusCurrent || !jiraStatusChecked) {
       void checkJiraConnection()
     }
+    if (!qunliStatusCurrent || !qunliStatusChecked) {
+      void checkQunliConnection()
+    }
     if (!preflightStatusCurrent || !preflightStatusChecked) {
       void refreshPreflightStatus()
     }
   }, [
     checkJiraConnection,
     checkLinearConnection,
+    checkQunliConnection,
     jiraStatusChecked,
     jiraStatusCurrent,
     jiraStatusContextKey,
@@ -47,6 +55,9 @@ export function useIntegrationProviderStatusRefresh(): void {
     preflightStatusContextKey,
     preflightStatusCurrent,
     providerRuntimeContextKey,
+    qunliStatusChecked,
+    qunliStatusCurrent,
+    qunliStatusContextKey,
     refreshPreflightStatus
   ])
 }

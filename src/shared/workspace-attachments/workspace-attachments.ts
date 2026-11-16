@@ -46,12 +46,24 @@ const ENGLISH_ATTACHMENT_LABELS: WorkspaceAttachmentLabelFormats = {
 export function workspaceAttachmentReferenceLabel(
   item: Pick<
     WorkspaceAttachment,
-    'provider' | 'type' | 'number' | 'identifier' | 'linearIdentifier' | 'jiraIdentifier'
+    | 'provider'
+    | 'type'
+    | 'number'
+    | 'identifier'
+    | 'linearIdentifier'
+    | 'jiraIdentifier'
+    | 'qunliIdentifier'
   >,
   formats: WorkspaceAttachmentLabelFormats = ENGLISH_ATTACHMENT_LABELS
 ): string {
-  if (item.provider === 'linear' || item.provider === 'jira') {
-    return item.identifier ?? item.linearIdentifier ?? item.jiraIdentifier ?? `#${item.number}`
+  if (item.provider === 'linear' || item.provider === 'jira' || item.provider === 'qunli') {
+    return (
+      item.identifier ??
+      item.linearIdentifier ??
+      item.jiraIdentifier ??
+      item.qunliIdentifier ??
+      `#${item.number}`
+    )
   }
   return formats[item.type](item.number)
 }

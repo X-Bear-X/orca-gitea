@@ -27,6 +27,9 @@ export function useTaskSourceProviderReadiness(
   )
   const jiraStatus = useAppStore((s) => s.jiraStatus)
   const jiraStatusChecked = useAppStore((s) => s.jiraStatusChecked)
+  const qunliStatus = useAppStore((s) => s.qunliStatus)
+  const qunliStatusChecked = useAppStore((s) => s.qunliStatusChecked)
+  const qunliStatusContextKey = useAppStore((s) => s.qunliStatusContextKey)
   const jiraStatusContextKey = useAppStore((s) => s.jiraStatusContextKey)
   const linearConnected = useLinearProviderConnected()
   const linearStatusChecked = useAppStore((s) => s.linearStatusChecked)
@@ -59,6 +62,8 @@ export function useTaskSourceProviderReadiness(
     preflightStatus.glab.authenticated === true
   const jiraChecking = jiraStatusContextKey !== providerRuntimeContextKey || !jiraStatusChecked
   const jiraConnected = !jiraChecking && jiraStatus.connected === true
+  const qunliChecking = qunliStatusContextKey !== providerRuntimeContextKey || !qunliStatusChecked
+  const qunliConnected = !qunliChecking && qunliStatus.connected === true
   const linearChecking =
     linearStatusContextKey !== providerRuntimeContextKey || !linearStatusChecked
   // Normalization returns a new array, so memoize by provider contents.
@@ -91,6 +96,11 @@ export function useTaskSourceProviderReadiness(
         connected: jiraConnected,
         checking: jiraChecking,
         visible: visible.has('jira')
+      },
+      qunli: {
+        connected: qunliConnected,
+        checking: qunliChecking,
+        visible: visible.has('qunli')
       }
     }
   }, [
@@ -104,6 +114,8 @@ export function useTaskSourceProviderReadiness(
     linearSkillLoading,
     linearSkillSettled,
     linearSkillUnverifiable,
+    qunliChecking,
+    qunliConnected,
     reviewChecking,
     reviewUnavailable,
     visibleProvidersKey

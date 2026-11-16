@@ -4,6 +4,7 @@ import type { GitHubTaskKind } from '../../../../shared/work-items/task-github-s
 import { buildGitHubRepoUrl } from '../../../../shared/github/repositories/links'
 import { getTaskSourceContextSummary } from './source-selection/task-source-context-summary'
 import { getGitHubProjectSourceSummary } from './task-page-source-context'
+import { useAppStore } from '@/store'
 
 type TaskPageSourceDisplayInput = TaskPageLinearCreationStateModel & {
   activeGithubTaskKind: GitHubTaskKind
@@ -39,6 +40,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
   const linearWorkspaceName =
     selectedLinearWorkspace?.organizationName ?? selectedLinearWorkspace?.id ?? null
   const jiraSiteName = selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null
+  const qunliAccountName = useAppStore((s) => s.qunliStatus.viewer?.accountName ?? null)
   // Why the catalog dep: it changes with the language, and the summary's own copy is translated too.
   const taskSourceContextSummary = useMemo(() => {
     const providerLabel =
@@ -51,7 +53,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
         hostLabelById
       })
     }
-    if (taskSource === 'linear' || taskSource === 'jira') {
+    if (taskSource === 'linear' || taskSource === 'jira' || taskSource === 'qunli') {
       return getTaskSourceContextSummary({
         provider: taskSource,
         providerLabel,
@@ -59,7 +61,8 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
         accountHostId: accountBackedTaskSourceHostId,
         hostLabelById,
         linearWorkspaceName,
-        jiraSiteName
+        jiraSiteName,
+        qunliAccountName
       })
     }
     return getTaskSourceContextSummary({
@@ -86,6 +89,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
     hostRegistryById,
     jiraSiteName,
     linearWorkspaceName,
+    qunliAccountName,
     selectedRepos.length,
     sourceOptions,
     taskSource,

@@ -41,6 +41,11 @@ export type TaskProviderErrorCode =
   | 'jira.incompleteProjectPage'
   | 'jira.projectListLimit'
   | 'jira.invalidCloudId'
+  | 'qunli.notConnected'
+  | 'qunli.apiKeyRequired'
+  | 'qunli.connectionFailed'
+  | 'qunli.statusNotAllowed'
+  | 'qunli.updateFailed'
 
 export function taskProviderFailure(
   errorCode: TaskProviderErrorCode,

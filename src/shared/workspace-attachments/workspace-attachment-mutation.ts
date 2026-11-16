@@ -86,6 +86,7 @@ export function mergeWorkspaceAttachmentMutation(
         'identifier',
         'linearIdentifier',
         'jiraIdentifier',
+        'qunliIdentifier',
         'linearWorkspaceId',
         'linearOrganizationUrlKey',
         'taskSourceContext'

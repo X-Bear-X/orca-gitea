@@ -10,11 +10,13 @@ import {
 } from '../../../../../shared/work-items/task-providers'
 import { JiraIcon } from '@/components/icons/JiraIcon'
 import { LinearIcon } from '@/components/icons/LinearIcon'
+import { QunliIcon } from '@/components/icons/QunliIcon'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store/index'
 import { SearchableSetting } from '../section-layout/SearchableSetting'
 import { CodeHostSetupSteps } from './TaskSourceCodeHostSetup'
 import { JiraSetupSteps } from './TaskSourceJiraSetup'
+import { QunliSetupSteps } from './TaskSourceQunliSetup'
 import { TaskSourceLinearSetup } from './TaskSourceLinearSetup'
 import { TaskSourceProviderCard } from './TaskSourceProviderCard'
 import {
@@ -23,7 +25,8 @@ import {
 } from './task-source-setup-state'
 import {
   JIRA_INTEGRATION_SECTION_ID,
-  LINEAR_INTEGRATION_SECTION_ID
+  LINEAR_INTEGRATION_SECTION_ID,
+  QUNLI_INTEGRATION_SECTION_ID
 } from '../../integrations/task-trackers/task-provider-integration-section-ids'
 import { getTasksPaneSearchKeywords } from './tasks-search'
 import { useIntegrationProviderStatusRefresh } from '../../../runtime/hosts/observations/use-integration-provider-status-refresh'
@@ -92,6 +95,18 @@ const PROVIDER_META: Record<
       )
     },
     Icon: ({ className }) => <JiraIcon className={className} />
+  },
+  qunli: {
+    get label() {
+      return translate('taskProviders.qunli.name', 'Qunli')
+    },
+    get description() {
+      return translate(
+        'taskProviders.qunli.tasksDescription',
+        'Browse the Qunli cards assigned to you and start workspaces from them.'
+      )
+    },
+    Icon: ({ className }) => <QunliIcon className={className} />
   }
 }
 
@@ -209,6 +224,15 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
                   canHide={canHide}
                   onToggleVisible={() => toggleProvider('linear')}
                   onOpenIntegrations={() => openIntegrations(LINEAR_INTEGRATION_SECTION_ID)}
+                />
+              ) : provider === 'qunli' ? (
+                <QunliSetupSteps
+                  connected={readiness.connected}
+                  checking={readiness.checking}
+                  visible={visible}
+                  canHide={canHide}
+                  onToggleVisible={() => toggleProvider('qunli')}
+                  onOpenIntegrations={() => openIntegrations(QUNLI_INTEGRATION_SECTION_ID)}
                 />
               ) : provider === 'jira' ? (
                 <JiraSetupSteps

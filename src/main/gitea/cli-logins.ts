@@ -1,7 +1,7 @@
-import { giteaCliExecFileAsync } from '../git/command-runner/gitea-cli-exec-file'
-import type { GiteaCliCommand } from '../git/command-runner/gitea-cli-exec-file'
-import { extractExecError } from '../git/exec-error'
-import { isHostCommandMissing } from '../git/command-runner/github-cli-host-fallback'
+import { giteaCliExecFileAsync } from '../git/command-runner/hosted-cli/gitea-cli-exec-file'
+import type { GiteaCliCommand } from '../git/command-runner/hosted-cli/gitea-cli-exec-file'
+import { extractExecError } from '../git/command-runner/process-capture/exec-error'
+import { isHostCommandMissing } from '../git/command-runner/hosted-cli/github-cli-host-fallback'
 
 export type GiteaCliLogin = {
   cli: GiteaCliCommand

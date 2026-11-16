@@ -277,6 +277,7 @@ import {
   TerminalArtifactFileChunk,
   TerminalArtifactFileWrite
 } from './filesystem/files-terminal-artifact-params'
+import { GiteaJobLogParams, GiteaPullRequestDetailsParams } from './gitea-params'
 import { BindableAccounts, ValidateAccountBinding } from './github/github-account-binding-params'
 import { UploadGitHubAttachment } from './github/github-attachment-params'
 import { CreateIssue, Issue, IssueComment, UpdateIssue } from './github/github-issue-params'
@@ -1201,6 +1202,8 @@ export const RPC_PARAMS_BY_METHOD = {
   'git.switchBranch': GitSwitchBranch,
   'git.unstage': GitFilePath,
   'git.upstreamStatus': GitTargetedRemote,
+  'gitea.jobLog': GiteaJobLogParams,
+  'gitea.prDetails': GiteaPullRequestDetailsParams,
   'github.addIssueComment': IssueComment,
   'github.addPRReviewComment': PRReviewComment,
   'github.addPRReviewCommentReply': PRReviewCommentReply,

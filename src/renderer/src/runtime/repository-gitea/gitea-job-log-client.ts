@@ -1,4 +1,4 @@
-import type { PRCheckDetail, PRCheckRunDetails } from '../../../../shared/github/check-types'
+import type { PRCheckDetail, PRCheckRunDetails } from '../../../../shared/github/checks/check-types'
 import {
   giteaJobCanHaveLog,
   giteaJobLogToCheckRunDetails

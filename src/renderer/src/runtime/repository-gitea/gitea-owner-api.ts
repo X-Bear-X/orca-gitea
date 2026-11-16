@@ -1,4 +1,4 @@
-import type { GiteaApi } from '../../../../preload/api/gitea-api'
+import type { GiteaApi } from '../../../../preload/api/gitea/gitea-api'
 import type {
   GiteaJobLogResult,
   GiteaPullRequestDetails

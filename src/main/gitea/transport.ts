@@ -1,5 +1,5 @@
-import { giteaCliExecFileAsync } from '../git/command-runner/gitea-cli-exec-file'
-import { extractExecError } from '../git/exec-error'
+import { giteaCliExecFileAsync } from '../git/command-runner/hosted-cli/gitea-cli-exec-file'
+import { extractExecError } from '../git/command-runner/process-capture/exec-error'
 import { cancelUnreadResponseBody } from '../lib/unread-response-body'
 import { giteaCliLoginForApiBase, type GiteaCliLogin } from './cli-logins'
 

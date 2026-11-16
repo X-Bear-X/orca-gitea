@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { HostedReviewInfo } from '../../../../../shared/source-control/hosted-review/hosted-review-contracts'
+import type { HostedReviewInfo } from '../../../../../../shared/source-control/hosted-review/hosted-review-contracts'
 import { isHostedDetailsRefreshContext, selectChecksPanelReview } from './checks-panel-review'
 
 function giteaReview(): HostedReviewInfo {

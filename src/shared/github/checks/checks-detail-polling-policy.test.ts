@@ -14,15 +14,15 @@ describe('ChecksDetailPollingPolicy.delayMs for Gitea', () => {
     const policy = new ChecksDetailPollingPolicy()
     policy.accept([passed])
 
-    expect(policy.delayMs('open', 'success', 60_000, 'gitea')).toBe(60_000)
-    expect(policy.delayMs('open', 'success', 420_000, 'gitea')).toBe(420_000)
-    expect(policy.delayMs('open', 'success', 900_000, 'gitea')).toBe(900_000)
+    expect(policy.delayMs('open', 'success', 60_000, 'default', 'gitea')).toBe(60_000)
+    expect(policy.delayMs('open', 'success', 420_000, 'default', 'gitea')).toBe(420_000)
+    expect(policy.delayMs('open', 'success', 900_000, 'default', 'gitea')).toBe(900_000)
   })
 
   it('keeps closed Gitea reviews on the 15 min cadence', () => {
     const policy = new ChecksDetailPollingPolicy()
     policy.accept([passed])
 
-    expect(policy.delayMs('closed', 'success', 60_000, 'gitea')).toBe(900_000)
+    expect(policy.delayMs('closed', 'success', 60_000, 'default', 'gitea')).toBe(900_000)
   })
 })

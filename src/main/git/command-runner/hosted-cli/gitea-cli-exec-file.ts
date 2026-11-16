@@ -1,10 +1,10 @@
-import { extractExecError, parseRetryAfterMs } from '../exec-error'
-import { resolveCommand } from './wsl-command-resolution'
+import { extractExecError, parseRetryAfterMs } from '../process-capture/exec-error'
+import { resolveCommand } from '../host-routing/wsl-command-resolution'
 import { resolveDefaultWslCliFallback } from './default-wsl-cli-fallback'
 import { isHostCommandMissing } from './github-cli-host-fallback'
-import { execFileCaptureToTermination } from './exec-file-capture'
+import { execFileCaptureToTermination } from '../process-capture/exec-file-capture'
 import { logHostedCliDeadlineKill } from './hosted-cli-deadline-log'
-import type { GitExecOptions } from './git-exec-options'
+import type { GitExecOptions } from '../git-exec-options'
 import { argsLookIdempotent } from './gh-idempotency'
 import {
   isTransientGhError,

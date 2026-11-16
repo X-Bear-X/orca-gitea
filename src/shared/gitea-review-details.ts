@@ -1,7 +1,7 @@
-import { stripAnsiEscapeSequences } from './ansi-escape-sequences'
+import { stripAnsiEscapeSequences } from './terminal/protocol/escape/ansi-escape-sequences'
 import { sliceCheckLogTail } from './source-control/checks/logs/check-job-log-tail-slice'
-import type { PRCheckDetail, PRCheckRunDetails } from './github/check-types'
-import type { PRComment } from './github/comment-types'
+import type { PRCheckDetail, PRCheckRunDetails } from './github/checks/check-types'
+import type { PRComment } from './github/comments/comment-types'
 
 export type GiteaActionStep = {
   name: string

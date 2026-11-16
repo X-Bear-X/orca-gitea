@@ -28,7 +28,7 @@ import {
   giteaCommentsSignature,
   giteaJobsToPRChecks
 } from '../../../../../../shared/gitea-review-details'
-import { nextGiteaRefreshIntervalMs } from '../../../../../../shared/review-refresh-policy'
+import { nextGiteaRefreshIntervalMs } from '../../../../../../shared/source-control/hosted-review/review-refresh-policy'
 import { translate } from '@/i18n/i18n'
 
 export type ChecksPanelPollingInput = Pick<

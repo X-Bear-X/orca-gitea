@@ -7,7 +7,7 @@ vi.mock('../git/command-runner/git-exec-file', async (importOriginal) => ({
     stderr: ''
   }))
 }))
-vi.mock('../git/command-runner/gitea-cli-exec-file', () => ({
+vi.mock('../git/command-runner/hosted-cli/gitea-cli-exec-file', () => ({
   giteaCliExecFileAsync: vi.fn(async (command: string) => {
     throw Object.assign(new Error(`spawn ${command} ENOENT`), { code: 'ENOENT' })
   })

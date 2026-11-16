@@ -1,5 +1,5 @@
 import type { GiteaPullRequestDetails } from '../../../../../shared/gitea-review-details'
-import type { ChecksPanelReview } from './checks-panel-review'
+import type { HostedReviewInfo as ChecksPanelReview } from '../../../../../shared/source-control/hosted-review/hosted-review-contracts'
 import { giteaApiFor } from '@/runtime/repository-gitea/gitea-owner-api'
 
 export function isGiteaChecksPanelReview(

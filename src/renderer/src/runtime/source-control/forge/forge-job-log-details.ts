@@ -1,5 +1,8 @@
-import type { GitLabProjectRef } from '../../../../../shared/gitlab-types'
-import type { PRCheckDetail, PRCheckRunDetails } from '../../../../../shared/github/check-types'
+import type { GitLabProjectRef } from '../../../../../shared/gitlab/gitlab-types'
+import type {
+  PRCheckDetail,
+  PRCheckRunDetails
+} from '../../../../../shared/github/checks/check-types'
 import { loadGiteaJobLogDetails } from '../../repository-gitea/gitea-job-log-client'
 import { loadGitLabJobLogDetails } from '../../repository-gitlab/gitlab-job-trace-client'
 

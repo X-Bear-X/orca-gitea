@@ -4,7 +4,7 @@ const { giteaCliExecFileAsyncMock } = vi.hoisted(() => ({
   giteaCliExecFileAsyncMock: vi.fn()
 }))
 
-vi.mock('../git/command-runner/gitea-cli-exec-file', () => ({
+vi.mock('../git/command-runner/hosted-cli/gitea-cli-exec-file', () => ({
   giteaCliExecFileAsync: giteaCliExecFileAsyncMock
 }))
 

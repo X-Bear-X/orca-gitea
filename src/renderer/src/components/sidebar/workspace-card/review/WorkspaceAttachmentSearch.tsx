@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useTranslate } from '@/i18n/use-translate'
+import { useAppStore } from '@/store'
 import { isScreenSubmitShortcut } from '@/lib/keyboard/screen-submit-shortcut'
 import type { WorkspaceAttachment } from '../../../../../../shared/worktree/types'
 import type { RowEntry } from '../../../new-workspace/name-field/smart-workspace-name-field-model'
@@ -49,6 +50,7 @@ export function WorkspaceAttachmentSearch({
   onRetry: () => void
 }): React.JSX.Element {
   const t = useTranslate()
+  const qunliAccountId = useAppStore((s) => s.qunliStatus.viewer?.accountId ?? null)
   const [selection, setSelection] = useState('')
   const inputId = useId()
   const contexts = useMemo(
@@ -115,7 +117,7 @@ export function WorkspaceAttachmentSearch({
     }
   }
   const rows = controller.rows
-  const parsedDirect = parseWorkspaceAttachmentInput(query, kind)
+  const parsedDirect = parseWorkspaceAttachmentInput(query, kind, qunliAccountId)
   const resolvedDirectRow =
     !controller.isQueryStale && parsedDirect
       ? rows.find((row) => {

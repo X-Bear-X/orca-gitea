@@ -24418,7 +24418,8 @@
         "jira_task_url": "Jira task (URL)",
         "bitbucket_pr": "Bitbucket PR",
         "azure_devops_pr": "Azure DevOps PR",
-        "gitea_pr": "Gitea PR"
+        "gitea_pr": "Gitea PR",
+        "qunli_card": "Qunli card"
       },
       "mrReference": "MR !{{number}}",
       "prReference": "PR #{{number}}",

@@ -18,6 +18,8 @@ import { parseGitLabIssueOrMRLink } from '../../../../../../shared/new-workspace
 import { parseLinearIssueInput } from '../../../../../../shared/linear/links'
 import { parseJiraIssueUrl } from '../../../../../../shared/jira/jira-issue-url'
 import { isWorkItemLinkQueryTooLarge } from '../../../../../../shared/new-workspace/work-item-link-query-bounds'
+import { parseQunliReferenceUrl } from '../../../../../../shared/qunli/qunli-reference-url'
+import { QUNLI_TASK_REF_PATTERN, qunliTaskUrl } from '../../../../../../shared/qunli/qunli-task-ref'
 
 export const ATTACHMENT_INPUT_KINDS = [
   { value: 'github-pr', label: () => translate('workspace.links.kind.github_pr', 'GitHub PR') },
@@ -37,6 +39,10 @@ export const ATTACHMENT_INPUT_KINDS = [
   {
     value: 'jira-issue',
     label: () => translate('workspace.links.kind.jira_task_url', 'Jira task (URL)')
+  },
+  {
+    value: 'qunli-task',
+    label: () => translate('workspace.links.kind.qunli_card', 'Qunli card')
   },
   {
     value: 'bitbucket-pr',
@@ -76,9 +82,26 @@ export function workspaceAttachmentLabel(item: WorkspaceAttachment): string {
   })
 }
 
+/** A bare card number such as T18430 or 18430, linked under the connected Qunli team. */
+function qunliCardFromRef(value: string, accountId: string | null): WorkspaceAttachment | null {
+  const ref = /^\d+$/.test(value) ? `T${value}` : value.toUpperCase()
+  if (!QUNLI_TASK_REF_PATTERN.test(ref)) {
+    return null
+  }
+  return {
+    provider: 'qunli',
+    type: 'issue',
+    number: 0,
+    identifier: ref,
+    qunliIdentifier: ref,
+    ...(accountId ? { url: qunliTaskUrl(accountId, ref) } : {})
+  }
+}
+
 export function parseWorkspaceAttachmentInput(
   input: string,
-  kind: AttachmentInputKind
+  kind: AttachmentInputKind,
+  qunliAccountId: string | null = null
 ): WorkspaceAttachment | null {
   const value = input.trim()
   if (!value || isWorkItemLinkQueryTooLarge(value)) {
@@ -92,6 +115,10 @@ export function parseWorkspaceAttachmentInput(
     const otherReview = parseOtherReviewUrl(value)
     if (otherReview) {
       return otherReview
+    }
+    const qunli = parseQunliReferenceUrl(value)
+    if (qunli) {
+      return qunli
     }
     if (github) {
       return { provider: 'github', type: github.type, number: github.number, url: value }
@@ -135,6 +162,9 @@ export function parseWorkspaceAttachmentInput(
   }
   if (kind === 'jira-issue') {
     return null
+  }
+  if (kind === 'qunli-task') {
+    return qunliCardFromRef(value, qunliAccountId)
   }
   const number = Number(value.replace(/^[#!]/, ''))
   if (!/^[#!]?\d+$/.test(value) || !Number.isSafeInteger(number) || number <= 0) {

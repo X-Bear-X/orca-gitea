@@ -5,6 +5,7 @@ import type {
   QunliTask
 } from '../../../../../shared/qunli/qunli-types'
 import { qunliListTasks, qunliMetadata } from '@/runtime/qunli/runtime-qunli-client'
+import { readQunliListPreferences, writeQunliListPreferences } from './qunli-list-preferences'
 import { defaultScopeSource } from '@/runtime/hosts/selection/default-creation-host'
 import { useAppStore } from '@/store'
 import { sortQunliTasks, type QunliSortColumn, type QunliSortDirection } from './qunli-list-model'
@@ -64,12 +65,35 @@ export function useTaskPageQunliList(
   const [truncated, setTruncated] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState<QunliListFilters>(EMPTY_FILTERS)
-  const [sortBy, setSortBy] = useState<QunliSortColumn>('updated')
-  const [sortDirection, setSortDirection] = useState<QunliSortDirection>('desc')
+  const [initialPreferences] = useState(readQunliListPreferences)
+  const [filters, setFilters] = useState<QunliListFilters>(() => ({
+    ...EMPTY_FILTERS,
+    assignee: initialPreferences.assignee,
+    projectId: initialPreferences.projectId,
+    statusId: initialPreferences.statusId,
+    typeId: initialPreferences.typeId,
+    finishing: initialPreferences.finishing,
+    hasWorkspace: initialPreferences.hasWorkspace
+  }))
+  const [sortBy, setSortBy] = useState<QunliSortColumn>(initialPreferences.sortBy)
+  const [sortDirection, setSortDirection] = useState<QunliSortDirection>(
+    initialPreferences.sortDirection
+  )
   const [refreshNonce, setRefreshNonce] = useState(0)
 
-  const { assignee, projectId, statusId, typeId, finishing } = filters
+  const { assignee, projectId, statusId, typeId, finishing, hasWorkspace } = filters
+  useEffect(() => {
+    writeQunliListPreferences({
+      assignee,
+      projectId,
+      statusId,
+      typeId,
+      finishing,
+      hasWorkspace,
+      sortBy,
+      sortDirection
+    })
+  }, [assignee, finishing, hasWorkspace, projectId, sortBy, sortDirection, statusId, typeId])
   useEffect(() => {
     if (!enabled || !viewerKey) {
       return
